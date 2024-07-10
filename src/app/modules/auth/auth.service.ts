@@ -4,6 +4,7 @@ import { JwtPayload, Secret } from 'jsonwebtoken'
 import config from '../../../config'
 import ApiError from '../../../errors/ApiError'
 import { jwtHelpers } from '../../../helper/jwtHelper'
+import { IUser } from '../user/user.interface'
 import { User } from '../user/user.model'
 import {
   IChangePassword,
@@ -86,7 +87,7 @@ const refreshToken = async (token: string): Promise<IRefreshTokenResponse> => {
 const changePassword = async (
   user: JwtPayload | null,
   payload: IChangePassword
-): Promise<void> => {
+): Promise<IUser | null> => {
   const { newPassword } = payload
   const users = new User()
   const isUserExist = await users.isUserExist(user?.email)
@@ -121,6 +122,8 @@ const changePassword = async (
       'Failed to update password'
     )
   }
+
+  return updatedUser;
 }
 
 export const AuthService = {
