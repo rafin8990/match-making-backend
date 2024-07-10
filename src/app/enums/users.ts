@@ -3,3 +3,20 @@ export enum ENUM_USER_ROLE {
   ADMIN = 'admin',
   USER = 'user',
 }
+
+export enum ENUM_USER_SEX {
+  MALE='male',
+  FEMALE='female',
+  OTHER='other'
+}
+
+export enum ENUM_USER_EDUCATION {
+  COLLEGE="college",
+  HIGH_SCHOOL="high school",
+  OTHER="other"
+}
+
+export enum ENUM_COMFORTABLE_RELATIONSHIP {
+  YES="yes",
+  NO="no"
+}

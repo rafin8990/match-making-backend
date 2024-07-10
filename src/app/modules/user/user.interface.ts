@@ -7,6 +7,18 @@ export type IUser = {
   passwordChangedAt?: Date;
   needsPasswordChange: true | false;
   isVerified: true | false;
+  name?:string;
+  address?:{
+    city?:string;
+    state?:string;
+    country?:string;
+
+  };
+  phoneNumber?:string;
+  
+  
+
+
 };
 
 export type IUserMethod = {
