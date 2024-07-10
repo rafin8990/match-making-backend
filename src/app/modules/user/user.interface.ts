@@ -1,4 +1,5 @@
 import { Model } from 'mongoose';
+import { ENUM_COMFORTABLE_RELATIONSHIP, ENUM_USER_EDUCATION, ENUM_USER_SEX } from '../../enums/users';
 
 export type IUser = {
   email: string;
@@ -15,8 +16,27 @@ export type IUser = {
 
   };
   phoneNumber?:string;
-  
-  
+  age?:number;
+  sex?:ENUM_USER_SEX ,
+  height?:{
+    fit:string,
+    inch:string
+  },
+  dateOfBirth?:string,
+  birthPlace?:string,
+  education?:ENUM_USER_EDUCATION,
+  educationDetails?:string,
+  profession?:string,
+  currentJob?:string,
+  language?:string,
+  jamatkhanaAttendence?:string,
+  haveChildren?:true | false,
+  personality?:string,
+  sports?:string,
+  hobbies?:string,
+  comfortableLongDistance?:ENUM_COMFORTABLE_RELATIONSHIP,
+
+
 
 
 };
