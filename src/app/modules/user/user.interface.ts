@@ -22,7 +22,7 @@ export type IUser = {
   height?: {
     fit: string
     inch: string
-  }
+  }     
   dateOfBirth?: string
   birthPlace?: string
   education?: 'college'|'high school'|'other'
