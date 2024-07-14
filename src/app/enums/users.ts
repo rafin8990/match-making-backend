@@ -5,18 +5,26 @@ export enum ENUM_USER_ROLE {
 }
 
 export enum ENUM_USER_SEX {
-  MALE='male',
-  FEMALE='female',
-  OTHER='other'
+  MALE = 'male',
+  FEMALE = 'female',
+  OTHER = 'other',
 }
 
 export enum ENUM_USER_EDUCATION {
-  COLLEGE="college",
-  HIGH_SCHOOL="high school",
-  OTHER="other"
+  COLLEGE = 'college',
+  HIGH_SCHOOL = 'high school',
+  OTHER = 'other',
 }
 
-export enum ENUM_COMFORTABLE_RELATIONSHIP {
-  YES="yes",
-  NO="no"
+export enum YESORNO {
+  YES = 'yes',
+  NO = 'no',
+}
+
+export enum USER_RELIGION {
+  ISLAM='islam',
+  HINDU='hindu',
+  BUDDHISM='buddhism',
+  CHRISTIAN='cristian',
+  OTHER='other'
 }
