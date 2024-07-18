@@ -1,8 +1,4 @@
 import { Model } from 'mongoose'
-import {
-  USER_RELIGION
-} from '../../enums/users'
-
 export type IUser = {
   email: string
   role: string
@@ -45,11 +41,6 @@ export type IUser = {
   investLongTermRelationship: 'yes' | 'no'
   countriesVisited?: number
   immigratedYear?: string
-  looks?: string
-  religion?: USER_RELIGION
-  joinFamilyLiving: 'yes' | 'no'
-  ageRange?: string
-  wantChildren?: 'yes' | 'no'
   image?: string
 }
 

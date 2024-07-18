@@ -1,5 +1,5 @@
-import { Schema, model } from 'mongoose';
-import { IUser, IUserMethod, userModel } from './user.interface';
+import { Schema, model } from 'mongoose'
+import { IUser, IUserMethod, userModel } from './user.interface'
 
 const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
   {
@@ -28,17 +28,123 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
       type: Boolean,
       default: false,
     },
+    name: {
+      type: String,
+    },
+    address: {
+      city: {
+        type: String,
+      },
+      state: {
+        type: String,
+      },
+      country: {
+        type: String,
+      },
+    },
+    phoneNumber: {
+      type: String,
+    },
+    age: {
+      type: String,
+    },
+    sex: {
+      type: String,
+      enum: ['male', 'female', 'other'],
+    },
+    height: {
+      fit: {
+        type: String,
+      },
+      inch: {
+        type: String,
+      },
+    },
+    dateOfBirth: {
+      type: String,
+    },
+    birthPlace: {
+      type: String,
+    },
+    education: {
+      type: String,
+      enum: ['college', 'high school', 'other'],
+    },
+    educationDetails: {
+      type: String,
+    },
+    profession: {
+      type: String,
+    },
+    currentJob: {
+      type: String,
+    },
+    language: {
+      type: String,
+    },
+    jamatkhanaAttendence: {
+      type: String,
+    },
+    haveChildren: {
+      type: Boolean,
+    },
+    personality: {
+      type: String,
+    },
+    sports: {
+      type: String,
+    },
+    hobbies: {
+      type: String,
+    },
+    comfortableLongDistance: {
+      type: String,
+      enum: ['yes', 'no'],
+    },
+    partnerGeneratingIncom: {
+      type: String,
+    },
+    socialHabits: {
+      type: String,
+    },
+    partnersFamilyBackground: {
+      type: String,
+    },
+    partnerAgeCompare: {
+      type: String,
+    },
+    reloacte: {
+      type: String,
+      enum: ['yes', 'no'],
+    },
+    supportPartnerWithElderlyParents: {
+      type: String,
+      enum: ['yes', 'no'],
+    },
+    investLongTermRelationship: {
+      type: String,
+      enum: ['yes', 'no'],
+    },
+    countriesVisited: {
+      type: Number,
+    },
+    immigratedYear: {
+      type: String,
+    },
+    image: {
+      type: String,
+    },
   },
   {
     timestamps: true,
     toJSON: {
       virtuals: true,
     },
-  },
-);
+  }
+)
 
 userSchema.methods.isUserExist = async function (
-  email: string,
+  email: string
 ): Promise<Partial<IUser | null>> {
   const user = await User.findOne(
     { email },
@@ -48,10 +154,10 @@ userSchema.methods.isUserExist = async function (
       role: 1,
       needsPasswordChange: 1,
       isVerified: 1,
-    },
-  );
-  return user;
-};
+    }
+  )
+  return user
+}
 
 // userSchema.methods.isPasswordMatched = async function (
 //   givenPassword: string,
@@ -69,4 +175,4 @@ userSchema.methods.isUserExist = async function (
 //   next();
 // });
 
-export const User = model<IUser, userModel>('User', userSchema);
+export const User = model<IUser, userModel>('User', userSchema)
