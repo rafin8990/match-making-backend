@@ -28,6 +28,18 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
       type: Boolean,
       default: false,
     },
+    isUpdated: {
+      type: Boolean,
+      default: false,
+    },
+    isAuthenticate: {
+      type: Boolean,
+      default: false,
+    },
+    isApproved: {
+      type: Boolean,
+      default: false,
+    },
     name: {
       type: String,
     },

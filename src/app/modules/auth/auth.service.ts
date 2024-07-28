@@ -88,13 +88,22 @@ const changePassword = async (
   user: JwtPayload | null,
   payload: IChangePassword
 ): Promise<IUser | null> => {
-  const { newPassword } = payload
+  const {oldPassword, newPassword } = payload
   const users = new User()
   const isUserExist = await users.isUserExist(user?.email)
   if (!isUserExist) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist')
   }
 
+   // checking old pass
+   const passwordMatched = users.isPasswordMatched(
+    oldPassword,
+    isUserExist.password as string,
+  );
+  if (isUserExist?.password && !passwordMatched) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Old Password did not matched');
+  }
+  
   // hash pass
   const newHashPassword = await bcrypt.hash(
     newPassword,
@@ -107,7 +116,7 @@ const changePassword = async (
     password: newHashPassword,
     needsPasswordChange: false,
     passwordChangedAt: new Date(),
-  }
+  }         
   // update password
   const updatedUser = await User.findOneAndUpdate(
     { email: email },

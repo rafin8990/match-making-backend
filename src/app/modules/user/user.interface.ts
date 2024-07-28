@@ -1,12 +1,15 @@
 import { Model } from 'mongoose'
 export type IUser = {
   email: string
-  role: string
+  role: 'user'|'admin'
   password: string
   passwordChangedAt?: Date
   needsPasswordChange: true | false
   isVerified: true | false
-  name?: string
+  isUpdated: true | false
+  isApproved: true | false
+  isAuthenticate: true | false
+  name?: string  
   address?: {
     city?: string
     state?: string

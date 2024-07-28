@@ -28,10 +28,10 @@ const createUser = async (user: IUser): Promise<IUser> => {
     password2,
     Number(config.bycrypt_sault_round)
   )
-  user.password = hashedPassword
-  
-  
-  user.role = 'user'
+  user.password = hashedPassword 
+  user.isVerified=false
+  user.isApproved=false 
+  user.role= 'user'
   await sendEmail(
     user.email,
     'Welcome to Match Making Platform',
@@ -122,8 +122,9 @@ const updateUser = async (
   try {
     const user = await User.findByIdAndUpdate(id, updateData, {
       new: true,
-      runValidators: true,
+      runValidators: true,                           
     })
+   
     if (!user) {
       throw new ApiError(httpStatus.NOT_FOUND, 'User not found')
     }
@@ -135,6 +136,7 @@ const updateUser = async (
     )
   }
 }
+
 
 const deleteUser = async (id: string): Promise<IUser | null> => {
   try {
