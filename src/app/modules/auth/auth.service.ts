@@ -13,6 +13,7 @@ import {
   ILoginUser,
   ILoginUserResponse,
   IRefreshTokenResponse,
+  IVerifyData,
 } from './auth.interface'
 
 const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
@@ -28,16 +29,16 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
 
   const givenPassword = await bcrypt.compare(password, user?.password as string)
 
-  console.log(givenPassword)
+  // console.log(givenPassword)
 
   if (!givenPassword) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Password did not match')
   }
 
-  if (user.isAuthenticate) {
+  if (user.is2Authenticate) {
     const verificationCode = Math.floor(100000 + Math.random() * 900000)
     const subject = 'Your Verification Code'
-    const text = `<p>Your verification code is <b>${verificationCode}</b>. Please enter this code to complete your login.</p>`
+    const text = `<p>Your verification code is <b>${verificationCode}</b>. Please enter this code to  your login your profile.</p>`
     user.verificationCode = verificationCode
     await user.save()
     await sendVerificationCode(user.email, subject, text)
@@ -45,13 +46,13 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
 
   // Create access and refresh tokens
   const accessToken = jwtHelpers.createToken(
-    { email: user.email, role: user.role },
+    { email: user.email, role: user.role, id: user._id, name: user.name },
     config.jwt_secret as string,
     config.jwt_expires_in as string
   )
 
   const refreshToken = jwtHelpers.createToken(
-    { email: user.email, role: user.role },
+    { email: user.email, role: user.role, id: user._id, name: user.name },
     config.jwt_refresh_secret as string,
     config.jwt_refresh_expires_in as string
   )
@@ -185,9 +186,47 @@ const forgetPassword = async (
   return updatedUser
 }
 
+const verify2FA = async (
+  verifyData: IVerifyData
+): Promise<ILoginUserResponse> => {
+  const { email, verificationCode } = verifyData
+  const user = await User.findOne({ email })
+
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist')
+  }
+
+  if (user.verificationCode !== verificationCode) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid verification code')
+  }
+
+  user.verificationCode = null
+  await user.save()
+
+  // Create access and refresh tokens
+  const accessToken = jwtHelpers.createToken(
+    { email: user.email, role: user.role, id: user._id, name: user.name },
+    config.jwt_secret as string,
+    config.jwt_expires_in as string
+  )
+
+  const refreshToken = jwtHelpers.createToken(
+    { email: user.email, role: user.role, id: user._id, name: user.name },
+    config.jwt_refresh_secret as string,
+    config.jwt_refresh_expires_in as string
+  )
+
+  return {
+    accessToken,
+    refreshToken,
+    needsPasswordChange: user.needsPasswordChange,
+  }
+}
+
 export const AuthService = {
   loginUser,
   refreshToken,
   changePassword,
   forgetPassword,
+  verify2FA,
 }
