@@ -17,4 +17,7 @@ export type ILoginUser = {
     oldPassword:string
     newPassword: string;
   };
+  export type IForgetPassword = {
+    newPassword: string;
+  };
   

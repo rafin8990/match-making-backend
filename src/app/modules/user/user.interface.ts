@@ -45,6 +45,7 @@ export type IUser = {
   countriesVisited?: number
   immigratedYear?: string
   image?: string
+  verificationCode:number
 }
 
 export type IUserMethod = {
