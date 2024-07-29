@@ -76,9 +76,27 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
       data: result,
     });
   });
+  const forgetPassword = catchAsync(async (req: Request, res: Response) => {
+    const { ...passwordData } = req.body;
+    // console.log(passwordData);
+    const token = req.headers.authorization as string;
+    const decoded = jwt.verify(token, config.jwt_secret as string) as JwtPayload;
+   const user= req.user = decoded;
+//    console.log(user)
+
+    const result = await AuthService.forgetPassword(user, passwordData);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true, 
+      message: 'Password Changed Successfully',
+      data: result,
+    });
+  });
 
   export const AuthController = {
     loginUser,
     refreshToken,
     changePassword,
+    forgetPassword
   };

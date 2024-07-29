@@ -146,6 +146,9 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
     image: {
       type: String,
     },
+    verificationCode: {
+      type: Number,
+    },
   },
   {
     timestamps: true,
