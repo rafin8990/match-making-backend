@@ -20,11 +20,9 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
     { password: 1, email: 1, role: 1, needsPasswordChange: 1 }
   )
 
-  console.log(password);
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist')
   }
-
 
   const givenPassword = await bcrypt.compare(password, user?.password as string)
 
@@ -88,22 +86,22 @@ const changePassword = async (
   user: JwtPayload | null,
   payload: IChangePassword
 ): Promise<IUser | null> => {
-  const {oldPassword, newPassword } = payload
+  const { oldPassword, newPassword } = payload
   const users = new User()
   const isUserExist = await users.isUserExist(user?.email)
   if (!isUserExist) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist')
   }
 
-   // checking old pass
-   const passwordMatched = users.isPasswordMatched(
+  // checking old pass
+  const passwordMatched = users.isPasswordMatched(
     oldPassword,
-    isUserExist.password as string,
-  );
+    isUserExist.password as string
+  )
   if (isUserExist?.password && !passwordMatched) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Old Password did not matched');
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Old Password did not matched')
   }
-  
+
   // hash pass
   const newHashPassword = await bcrypt.hash(
     newPassword,
@@ -116,7 +114,7 @@ const changePassword = async (
     password: newHashPassword,
     needsPasswordChange: false,
     passwordChangedAt: new Date(),
-  }         
+  }
   // update password
   const updatedUser = await User.findOneAndUpdate(
     { email: email },
@@ -132,7 +130,7 @@ const changePassword = async (
     )
   }
 
-  return updatedUser;
+  return updatedUser
 }
 
 export const AuthService = {
