@@ -32,7 +32,7 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
       type: Boolean,
       default: false,
     },
-    isAuthenticate: {
+    is2Authenticate: {
       type: Boolean,
       default: false,
     },

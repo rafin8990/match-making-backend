@@ -1,15 +1,15 @@
 import { Model } from 'mongoose'
 export type IUser = {
   email: string
-  role: 'user'|'admin'
+  role: 'user' | 'admin'
   password: string
   passwordChangedAt?: Date
   needsPasswordChange: true | false
   isVerified: true | false
   isUpdated: true | false
   isApproved: true | false
-  isAuthenticate: true | false
-  name?: string  
+  is2Authenticate: true | false
+  name?: string
   address?: {
     city?: string
     state?: string
@@ -17,14 +17,14 @@ export type IUser = {
   }
   phoneNumber?: string
   age?: number
-  sex?: 'male'|'female'|'other'
+  sex?: 'male' | 'female' | 'other'
   height?: {
     fit: string
     inch: string
-  }     
+  }
   dateOfBirth?: string
   birthPlace?: string
-  education?: 'college'|'high school'|'other'
+  education?: 'college' | 'high school' | 'other'
   educationDetails?: string
   profession?: string
   currentJob?: string
@@ -45,7 +45,7 @@ export type IUser = {
   countriesVisited?: number
   immigratedYear?: string
   image?: string
-  verificationCode:number
+  verificationCode: number | null
 }
 
 export type IUserMethod = {
