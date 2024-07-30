@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt'
 import { Schema, model } from 'mongoose'
 import { IUser, IUserMethod, userModel } from './user.interface'
 
@@ -174,13 +175,13 @@ userSchema.methods.isUserExist = async function (
   return user
 }
 
-// userSchema.methods.isPasswordMatched = async function (
-//   givenPassword: string,
-//   savedPassword: string,
-// ): Promise<boolean> {
-//   const isMatched = await bcrypt.compare(givenPassword, savedPassword);
-//   return isMatched;
-// };
+userSchema.methods.isPasswordMatched = async function (
+  givenPassword: string,
+  savedPassword: string,
+): Promise<boolean> {
+  const isMatched = await bcrypt.compare(givenPassword, savedPassword);
+  return isMatched;
+};
 
 // userSchema.pre('save', async function (next) {
 //   this.password = await bcrypt.hash(

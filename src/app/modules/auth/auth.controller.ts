@@ -60,7 +60,6 @@ const refreshToken: RequestHandler = catchAsync(
 
 const changePassword = catchAsync(async (req: Request, res: Response) => {
   const { ...passwordData } = req.body
-  console.log(passwordData)
   const token = req.headers.authorization as string
   const decoded = jwt.verify(token, config.jwt_secret as string) as JwtPayload
   const user = (req.user = decoded)
