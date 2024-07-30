@@ -20,7 +20,13 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
   const { email, password } = payload
   const user = await User.findOne(
     { email: email },
-    { password: 1, email: 1, role: 1, needsPasswordChange: 1 }
+    {
+      password: 1,
+      email: 1,
+      role: 1,
+      needsPasswordChange: 1,
+      is2Authenticate: 1,
+    }
   )
 
   if (!user) {
@@ -35,15 +41,16 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Password did not match')
   }
 
-  if (user.is2Authenticate) {
+  if (user.is2Authenticate === true) {
     const verificationCode = Math.floor(100000 + Math.random() * 900000)
     const subject = 'Your Verification Code'
-    const text = `<p>Your verification code is <b>${verificationCode}</b>. Please enter this code to  your login your profile.</p>`
+    const text = `Your verification code is ${verificationCode}. Please enter this code to  your login your profile.`
     user.verificationCode = verificationCode
     await user.save()
-    await sendVerificationCode(user.email, subject, text)
+    await sendVerificationCode(email, subject, text)
   }
 
+  console.log(user)
   // Create access and refresh tokens
   const accessToken = jwtHelpers.createToken(
     { email: user.email, role: user.role, id: user._id, name: user.name },
@@ -187,9 +194,11 @@ const forgetPassword = async (
 }
 
 const verify2FA = async (
+  userData: JwtPayload | null,
   verifyData: IVerifyData
-): Promise<ILoginUserResponse> => {
-  const { email, verificationCode } = verifyData
+): Promise<IUser> => {
+  const { verificationCode } = verifyData
+  const email = userData?.email
   const user = await User.findOne({ email })
 
   if (!user) {
@@ -203,24 +212,7 @@ const verify2FA = async (
   user.verificationCode = null
   await user.save()
 
-  // Create access and refresh tokens
-  const accessToken = jwtHelpers.createToken(
-    { email: user.email, role: user.role, id: user._id, name: user.name },
-    config.jwt_secret as string,
-    config.jwt_expires_in as string
-  )
-
-  const refreshToken = jwtHelpers.createToken(
-    { email: user.email, role: user.role, id: user._id, name: user.name },
-    config.jwt_refresh_secret as string,
-    config.jwt_refresh_expires_in as string
-  )
-
-  return {
-    accessToken,
-    refreshToken,
-    needsPasswordChange: user.needsPasswordChange,
-  }
+ return user;
 }
 
 export const AuthService = {

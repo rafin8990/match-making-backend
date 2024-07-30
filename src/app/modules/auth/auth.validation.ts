@@ -38,9 +38,6 @@ const forgetPasswordZodSchema = z.object({
 })
 const verify2FAZodSchema = z.object({
   body: z.object({
-    email: z.string({
-      required_error: 'New Password is required',
-    }),
     verificationCode: z.number({
       required_error: 'Verification code is required',
     }),

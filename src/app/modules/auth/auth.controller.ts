@@ -95,28 +95,17 @@ const forgetPassword = catchAsync(async (req: Request, res: Response) => {
 
 const verify2FA = async (req: Request, res: Response) => {
   const { ...verifyData } = req.body
-  const tokens = await AuthService.verify2FA(verifyData)
-
-  const { refreshToken, ...others } = tokens
-
-  // set refresh token into the cookie
-
-  const cookieOption = {
-    secure: config.env === 'production' ? true : false,
-    httpOnly: true,
-  }
-
-  res.cookie('refreshToken', refreshToken, cookieOption)
-
-  // delete refresh token
-  if ('refreshToken' in tokens) {
-    delete tokens.refreshToken
-  }
+  
+  const token = req.headers.authorization as string
+  const decoded = jwt.verify(token, config.jwt_secret as string) as JwtPayload
+  const user = (req.user = decoded)
+  const tokens = await AuthService.verify2FA(user,verifyData)
+  
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Password Matched Successfully',
-    data: others,
+    message: 'Pin Matched Successfully',
+    data: tokens,
   })
 }
 
