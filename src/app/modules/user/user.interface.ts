@@ -46,6 +46,7 @@ export type IUser = {
   immigratedYear?: string
   image?: string
   verificationCode: number | null
+  pendingUpdates?: Partial<IUser>;
 }
 
 export type IUserMethod = {

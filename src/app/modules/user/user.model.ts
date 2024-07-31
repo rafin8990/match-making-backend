@@ -150,6 +150,9 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
     verificationCode: {
       type: Number,
     },
+    pendingUpdates: {
+      type: Schema.Types.Mixed,
+    },
   },
   {
     timestamps: true,
@@ -177,11 +180,11 @@ userSchema.methods.isUserExist = async function (
 
 userSchema.methods.isPasswordMatched = async function (
   givenPassword: string,
-  savedPassword: string,
+  savedPassword: string
 ): Promise<boolean> {
-  const isMatched = await bcrypt.compare(givenPassword, savedPassword);
-  return isMatched;
-};
+  const isMatched = await bcrypt.compare(givenPassword, savedPassword)
+  return isMatched
+}
 
 // userSchema.pre('save', async function (next) {
 //   this.password = await bcrypt.hash(

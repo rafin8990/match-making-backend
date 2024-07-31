@@ -1,32 +1,32 @@
-import { Request, Response } from 'express';
-import httpStatus from 'http-status';
-import catchAsync from '../../../shared/catchAsync';
-import pick from '../../../shared/pick';
-import sendResponse from '../../../shared/sendResponse';
-import { paginationFields } from '../../constants/pagination';
-import { IUserFilter, UserFilterableFields } from './user.constant';
-import { IUser } from './user.interface';
-import { UserService } from './user.service';
+import { Request, Response } from 'express'
+import httpStatus from 'http-status'
+import catchAsync from '../../../shared/catchAsync'
+import pick from '../../../shared/pick'
+import sendResponse from '../../../shared/sendResponse'
+import { paginationFields } from '../../constants/pagination'
+import { IUserFilter, UserFilterableFields } from './user.constant'
+import { IUser } from './user.interface'
+import { UserService } from './user.service'
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
-  const user = req.body;
-  const result = await UserService.createUser(user);
+  const user = req.body
+  const result = await UserService.createUser(user)
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message: 'User created successfully',
     success: true,
     data: result,
-  });
-});
+  })
+})
 
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
   const filters: IUserFilter = {
     ...pick(req.query, UserFilterableFields),
     searchTerm: req.query.searchTerm as string,
-  };
-  const paginationOptions = pick(req.query, paginationFields);
+  }
+  const paginationOptions = pick(req.query, paginationFields)
 
-  const result = await UserService.getAllUsers(filters, paginationOptions);
+  const result = await UserService.getAllUsers(filters, paginationOptions)
 
   sendResponse<IUser[]>(res, {
     statusCode: httpStatus.OK,
@@ -34,50 +34,81 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
     success: true,
     meta: result.meta,
     data: result.data,
-  });
-});
+  })
+})
 
 const getSingleUser = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.params.id;
-  const result = await UserService.getSingleUser(userId);
+  const userId = req.params.id
+  const result = await UserService.getSingleUser(userId)
 
   sendResponse<IUser>(res, {
     statusCode: httpStatus.OK,
     message: 'User retrieved successfully',
     success: true,
     data: result,
-  });
-});
+  })
+})
 
 const updateUser = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.params.id;
-  const updateData = req.body;
-  const result = await UserService.updateUser(userId, updateData);
+  const userId = req.params.id
+  const updateData = req.body
+  const result = await UserService.updateUser(userId, updateData)
 
   sendResponse<IUser>(res, {
     statusCode: httpStatus.OK,
     message: 'User updated successfully',
     success: true,
     data: result,
-  });
-});
+  })
+})
+
+const submitUserUpdate = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.params.id
+  const updateData: Partial<IUser> = req.body
+
+  const result = await UserService.submitUserUpdate(userId, updateData)
+
+  sendResponse<IUser>(res, {
+    statusCode: httpStatus.OK,
+    message: 'User update submitted successfully. Pending admin approval.',
+    success: true,
+    data: result,
+  })
+})
+
+const approveUserUpdate = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.params.id
+
+  const result = await UserService.approveUserUpdate(userId)
+
+  sendResponse<IUser>(res, {
+    statusCode: httpStatus.OK,
+    message: 'User update approved successfully.',
+    success: true,
+    data: result,
+  })
+})
+
+
 
 const deleteUser = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.params.id;
-  const result = await UserService.deleteUser(userId);
+  const userId = req.params.id
+  const result = await UserService.deleteUser(userId)
 
   sendResponse<IUser>(res, {
     statusCode: httpStatus.OK,
     message: 'User deleted successfully',
     success: true,
     data: result,
-  });
-});
+  })
+})
 
 export const userController = {
   createUser,
   getAllUsers,
   getSingleUser,
   updateUser,
+  submitUserUpdate,
+  approveUserUpdate,
   deleteUser,
-};
+}
