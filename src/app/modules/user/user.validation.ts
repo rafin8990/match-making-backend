@@ -10,6 +10,7 @@ const createUserZodSchema = z.object({
     isVerified: z.boolean().optional(),
   }),
 })
+
 const UpdateUserZodSchema = z.object({
   body: z.object({
     email: z.string().email().optional(),
@@ -20,7 +21,7 @@ const UpdateUserZodSchema = z.object({
     isVerified: z.boolean().optional(),
     isUpdated: z.boolean().optional(),
     isApproved: z.boolean().optional(),
-    isAuthenticate: z.boolean().optional(),
+    isAuthenticate: z.boolean().optional(), 
     name: z.string().optional(),
     address: z.object({
       city: z.string().optional(),
@@ -51,7 +52,7 @@ const UpdateUserZodSchema = z.object({
     socialHabits: z.string().optional(),
     partnersFamilyBackground: z.string().optional(),
     partnerAgeCompare: z.string().optional(),
-    relocate: z.enum(['yes', 'no']).optional(),
+    relocate: z.enum(['yes', 'no']).optional(), 
     supportPartnerWithElderlyParents: z.enum(['yes', 'no']).optional(),
     investLongTermRelationship: z.enum(['yes', 'no']).optional(),
     countriesVisited: z.number().optional(),

@@ -89,6 +89,20 @@ const approveUserUpdate = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
+const declineUserUpdate = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.params.id;
+  const { reason } = req.body;
+
+  const result = await UserService.declineUserUpdate(userId, reason);
+
+  sendResponse<IUser>(res, {
+    statusCode: httpStatus.OK,
+    message: 'User update request declined.',
+    success: true,
+    data: result,
+  });
+});
+
 
 
 const deleteUser = catchAsync(async (req: Request, res: Response) => {
@@ -110,5 +124,6 @@ export const userController = {
   updateUser,
   submitUserUpdate,
   approveUserUpdate,
+  declineUserUpdate,
   deleteUser,
 }

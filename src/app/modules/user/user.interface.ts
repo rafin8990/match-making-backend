@@ -47,6 +47,7 @@ export type IUser = {
   image?: string
   verificationCode: number | null
   pendingUpdates?: Partial<IUser>;
+  updateStatusMessage:string
 }
 
 export type IUserMethod = {

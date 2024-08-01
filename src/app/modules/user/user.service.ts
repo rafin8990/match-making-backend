@@ -22,16 +22,16 @@ const createUser = async (user: IUser): Promise<IUser> => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email Already exists')
   }
 
-  const password2 = generateRandomPassword();
+  const password2 = generateRandomPassword()
 
   const hashedPassword = await bcrypt.hash(
     password2,
     Number(config.bycrypt_sault_round)
   )
-  user.password = hashedPassword 
-  user.isVerified=false
-  user.isApproved=false 
-  user.role= 'user'
+  user.password = hashedPassword
+  user.isVerified = false
+  user.isApproved = false
+  user.role = 'user'
   await sendEmail(
     user.email,
     'Welcome to Match Making Platform',
@@ -120,9 +120,9 @@ const updateUser = async (
   try {
     const user = await User.findByIdAndUpdate(id, updateData, {
       new: true,
-      runValidators: true,                           
+      runValidators: true,
     })
-   
+
     if (!user) {
       throw new ApiError(httpStatus.NOT_FOUND, 'User not found')
     }
@@ -135,19 +135,54 @@ const updateUser = async (
   }
 }
 
-const submitUserUpdate = async (id: string, updateData: Partial<IUser>): Promise<IUser | null> => {
+const submitUserUpdate = async (
+  id: string,
+  updateData: Partial<IUser>
+): Promise<IUser | null> => {
+  const user = await User.findById(id)
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found')
+  }
+
+  user.pendingUpdates = { ...user.pendingUpdates, ...updateData }
+  user.isUpdated = false
+  await user.save()
+
+  return user
+}
+
+const approveUserUpdate = async (id: string): Promise<IUser | null> => {
+  const user = await User.findById(id)
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found')
+  }
+
+  if (user.pendingUpdates) {
+    Object.assign(user, user.pendingUpdates)
+    user.pendingUpdates = undefined
+    user.isApproved = true
+    await user.save()
+  }
+
+  return user
+}
+
+const declineUserUpdate = async (id: string, reason: string): Promise<IUser | null> => {
   const user = await User.findById(id);
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
 
-  user.pendingUpdates = { ...user.pendingUpdates, ...updateData };
+  user.pendingUpdates = undefined;
+  user.isApproved = false;
   user.isUpdated = false;
-  await user.save();
+  user.updateStatusMessage = `Update request declined: ${reason}`;
+  await user.save(); 
+
+  await sendEmail(user.email, 'Update Request Declined', user.updateStatusMessage);
 
   return user;
 };
-
 
 const deleteUser = async (id: string): Promise<IUser | null> => {
   try {
@@ -164,22 +199,6 @@ const deleteUser = async (id: string): Promise<IUser | null> => {
   }
 }
 
-const approveUserUpdate = async (id: string): Promise<IUser | null> => {
-  const user = await User.findById(id);
-  if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
-  }
-
-  if (user.pendingUpdates) {
-    Object.assign(user, user.pendingUpdates);
-    user.pendingUpdates = undefined;
-    user.isApproved = true; // Mark as approved
-    await user.save();
-  }
-
-  return user;
-};
-
 export const UserService = {
   createUser,
   getAllUsers,
@@ -187,5 +206,6 @@ export const UserService = {
   updateUser,
   submitUserUpdate,
   approveUserUpdate,
+  declineUserUpdate,
   deleteUser,
 }

@@ -153,6 +153,7 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
     pendingUpdates: {
       type: Schema.Types.Mixed,
     },
+    updateStatusMessage: { type: String, default: '' }
   },
   {
     timestamps: true,
