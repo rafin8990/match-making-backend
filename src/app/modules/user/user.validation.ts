@@ -1,11 +1,11 @@
-import { z } from 'zod';
+import { z } from 'zod'
 
 const createUserZodSchema = z.object({
   body: z.object({
     email: z.string({
       required_error: 'Email is required',
     }),
-    needsPasswordChange:z.boolean().optional(),
+    needsPasswordChange: z.boolean().optional(),
     passwordChangedAt: z.date().optional(),
     isVerified: z.boolean().optional(),
   }),
@@ -21,20 +21,19 @@ const UpdateUserZodSchema = z.object({
     isVerified: z.boolean().optional(),
     isUpdated: z.boolean().optional(),
     isApproved: z.boolean().optional(),
-    isAuthenticate: z.boolean().optional(), 
+    isAuthenticate: z.boolean().optional(),
     name: z.string().optional(),
-    address: z.object({
-      city: z.string().optional(),
-      state: z.string().optional(),
-      country: z.string().optional(),
-    }).optional(),
+    address: z
+      .object({
+        city: z.string().optional(),
+        state: z.string().optional(),
+        country: z.string().optional(),
+      })
+      .optional(),
     phoneNumber: z.string().optional(),
     age: z.number().optional(),
     sex: z.enum(['male', 'female', 'other']).optional(),
-    height: z.object({
-      fit: z.string(),
-      inch: z.string(),
-    }).optional(),
+    height: z.string().optional(),
     dateOfBirth: z.string().optional(),
     birthPlace: z.string().optional(),
     education: z.enum(['college', 'high school', 'other']).optional(),
@@ -52,7 +51,7 @@ const UpdateUserZodSchema = z.object({
     socialHabits: z.string().optional(),
     partnersFamilyBackground: z.string().optional(),
     partnerAgeCompare: z.string().optional(),
-    relocate: z.enum(['yes', 'no']).optional(), 
+    relocate: z.enum(['yes', 'no']).optional(),
     supportPartnerWithElderlyParents: z.enum(['yes', 'no']).optional(),
     investLongTermRelationship: z.enum(['yes', 'no']).optional(),
     countriesVisited: z.number().optional(),
@@ -60,10 +59,8 @@ const UpdateUserZodSchema = z.object({
     image: z.string().optional(),
     verificationCode: z.number().optional(),
   }),
-});
+})
 export const UserValidation = {
   createUserZodSchema,
-  UpdateUserZodSchema
-};
-
-
+  UpdateUserZodSchema,
+}

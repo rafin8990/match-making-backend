@@ -18,10 +18,7 @@ export type IUser = {
   phoneNumber?: string
   age?: number
   sex?: 'male' | 'female' | 'other'
-  height?: {
-    fit: string
-    inch: string
-  }
+  height?: string
   dateOfBirth?: string
   birthPlace?: string
   education?: 'college' | 'high school' | 'other'
@@ -41,13 +38,21 @@ export type IUser = {
   partnerAgeCompare?: string
   reloacte?: 'yes' | 'no'
   supportPartnerWithElderlyParents?: 'yes' | 'no'
-  investLongTermRelationship: 'yes' | 'no'
+  investLongTermRelationship?: 'yes' | 'no'
   countriesVisited?: number
   immigratedYear?: string
   image?: string
-  verificationCode: number | null
-  pendingUpdates?: Partial<IUser>;
-  updateStatusMessage:string
+  verificationCode?: number | null
+  pendingUpdates?: Partial<IUser>
+  updateStatusMessage?: string
+  preferences: {
+    looks?: number
+    religion?: number
+    joinFamilyLiving?: number
+    education?: number
+    ageRange?: number
+    wantChildren?: number
+  }
 }
 
 export type IUserMethod = {

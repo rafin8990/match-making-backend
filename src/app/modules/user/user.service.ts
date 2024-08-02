@@ -160,29 +160,35 @@ const approveUserUpdate = async (id: string): Promise<IUser | null> => {
   if (user.pendingUpdates) {
     Object.assign(user, user.pendingUpdates)
     user.pendingUpdates = undefined
-    user.isApproved = true
+    user.isUpdated = true
     await user.save()
   }
 
   return user
 }
 
-const declineUserUpdate = async (id: string, reason: string): Promise<IUser | null> => {
-  const user = await User.findById(id);
+const declineUserUpdate = async (
+  id: string,
+  reason: string
+): Promise<IUser | null> => {
+  const user = await User.findById(id)
   if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found')
   }
 
-  user.pendingUpdates = undefined;
-  user.isApproved = false;
-  user.isUpdated = false;
-  user.updateStatusMessage = `Update request declined: ${reason}`;
-  await user.save(); 
+  user.pendingUpdates = undefined
+  user.isUpdated = false
+  user.updateStatusMessage = `Update request declined: ${reason}`
+  await user.save()
 
-  await sendEmail(user.email, 'Update Request Declined', user.updateStatusMessage);
+  await sendEmail(
+    user.email,
+    'Update Request Declined',
+    user.updateStatusMessage
+  )
 
-  return user;
-};
+  return user
+}
 
 const deleteUser = async (id: string): Promise<IUser | null> => {
   try {
