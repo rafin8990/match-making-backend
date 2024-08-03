@@ -57,7 +57,6 @@ export const sendEmail = async (to: string, subject: string, text: string) => {
       },
     })
   )
-
   const mailOptions = {
     from: config.emailFrom,
     to,
