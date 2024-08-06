@@ -50,7 +50,7 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
     await sendVerificationCode(email, subject, text)
   }
 
-  console.log(user)
+ 
   // Create access and refresh tokens
   const accessToken = jwtHelpers.createToken(
     { email: user.email, role: user.role, id: user._id, name: user.name },
