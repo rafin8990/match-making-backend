@@ -1,99 +1,97 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import httpStatus from 'http-status'
-import ApiError from '../../../errors/ApiError'
 import { IGenericResponse } from '../../../interfaces/common'
 import { IUser } from '../user/user.interface'
 import { User } from '../user/user.model'
-
-const findSuggestedMatches = async (userId: string): Promise<IUser[]> => {
-  const user = await User.findById(userId)
-  if (!user) throw new ApiError(httpStatus.NOT_FOUND, 'User not found')
-  const query: any = {
-    _id: { $ne: userId },
-    sex: { $ne: user.sex },
-  }
-
-  if (user?.preferences) {
-    if (user?.preferences.looks !== undefined)
-      query['user?.preferences?.looks'] = user?.preferences.looks
-    if (user?.preferences.religion !== undefined)
-      query['user?.preferences?.religion'] = user?.preferences.religion
-    if (user?.preferences.joinFamilyLiving !== undefined)
-      query['user?.preferences?.joinFamilyLiving'] =
-        user?.preferences.joinFamilyLiving
-    if (user?.preferences.education !== undefined)
-      query['user?.preferences?.education'] = user?.preferences.education
-    if (user?.preferences.wantChildren !== undefined)
-      query['user?.preferences?.wantChildren'] = user?.preferences.wantChildren
-  }
-
-  if (user?.currentJob !== undefined) query.currentJob = user.currentJob
-  if (user?.comfortableLongDistance !== undefined)
-    query.comfortableLongDistance = user.comfortableLongDistance
-  if (user?.partnerGeneratingIncom !== undefined)
-    query.partnerGeneratingIncom = user.partnerGeneratingIncom
-  if (user?.socialHabits !== undefined) query.socialHabits = user.socialHabits
-  if (user?.partnersFamilyBackground !== undefined)
-    query.partnersFamilyBackground = user.partnersFamilyBackground
-  if (user?.partnerAgeCompare !== undefined)
-    query.partnerAgeCompare = user.partnerAgeCompare
-  if (user?.reloacte !== undefined) query.reloacte = user.reloacte
-  if (user?.supportPartnerWithElderlyParents !== undefined)
-    query.supportPartnerWithElderlyParents =
-      user.supportPartnerWithElderlyParents
-  if (user?.investLongTermRelationship !== undefined)
-    query.investLongTermRelationship = user.investLongTermRelationship
-
-  const suggestedMatches = await User.find(query)
-  return suggestedMatches
-}
 
 const getUserDetails = async (userId: string): Promise<IUser | null> => {
   return User.findById(userId).exec()
 }
 
 const getSuggestedUsers = async (user: IUser): Promise<IGenericResponse<IUser[]>> => {
-  const query: any = {}
+  const query: any[] = [];
 
-  if (user?.preferences?.ageRange) {
-    query.age = user?.preferences.ageRange
-  }
 
   if (user?.education) {
-    query.education = user?.education
+    query.push({ education: user.education });
   }
+  if (user?.name) {
+    query.push({ name: user.name });
+  }
+  if (user?.dateOfBirth) {
+    query.push({ dateOfBirth: user.dateOfBirth });
+  }
+  if (user?.age) {
+    query.push({ age: user.age });
+  }
+  if (user?.address?.city) {
+    query.push({ city: user?.address?.city });
+  }
+  if (user?.address?.country) {
+    query.push({ country: user?.address?.country });
+  }
+  if (user?.sex) {
+    query.push({ sex: user.sex });
+  }
+  if (user?.birthPlace) {
+    query.push({ birthPlace: user.birthPlace });
+  }
+  if (user?.profession) {
+    query.push({ profession: user.profession });
+  }
+  if (user?.currentJob) {
+    query.push({ currentJob: user.currentJob });
+  }
+  if (user?.language) {
+    query.push({ language: user.language });
+  }
+  if (user?.hobbies) {
+    query.push({ hobbies: user.hobbies });
+  }
+  if (user?.comfortableLongDistance) {
+    query.push({ comfortableLongDistance: user.comfortableLongDistance });
+  }
+  if (user?.partnerGeneratingIncom) {
+    query.push({ partnerGeneratingIncom: user.partnerGeneratingIncom });
+  }
+  if (user?.socialHabits) {
+    query.push({ socialHabits: user.socialHabits });
+  }
+  if (user?.partnersFamilyBackground) {
+    query.push({ partnersFamilyBackground: user.partnersFamilyBackground });
+  }
+  if (user?.partnerAgeCompare) {
+    query.push({ partnerAgeCompare: user.partnerAgeCompare });
+  }
+  if (user?.reloacte) {
+    query.push({ reloacte: user.reloacte });
+  }
+  if (user?.supportPartnerWithElderlyParents) {
+    query.push({ supportPartnerWithElderlyParents: user.supportPartnerWithElderlyParents });
+  }
+  if (user?.investLongTermRelationship) {
+    query.push({ investLongTermRelationship: user.investLongTermRelationship });
+  }
+  if (user?.countriesVisited) {
+    query.push({ countriesVisited: user.countriesVisited });
+  }
+  if (user?.immigratedYear) {
+    query.push({ immigratedYear: user.immigratedYear });
+  }
+ 
+  console.log(query)
+  const matchesUser = await User.find({ $or: query }).exec();
+  const total = await User.countDocuments(matchesUser);
 
-  if (user?.preferences?.wantChildren !== undefined) {
-    query.haveChildren = user?.preferences?.wantChildren
-  }
-
-  if (user?.preferences?.religion !== undefined) {
-    query['user?.preferences.religion'] = user?.preferences?.religion
-  }
-
-  if (user?.preferences?.looks !== undefined) {
-    query['user?.preferences.looks'] = { $gte: user?.preferences.looks }
-  }
-
-  if (user?.preferences?.joinFamilyLiving !== undefined) {
-    query['user?.preferences.joinFamilyLiving'] = user?.preferences.joinFamilyLiving
-  }
-  const matchesUser = await User.find(query).exec()
-  console.log(matchesUser);
-  const total = await User.countDocuments(matchesUser)
-  // console.log(total);
   return {
     meta: {
-      page:0,
-      limit:0,
+      page: 0,
+      limit: 0,
       total,
     },
     data: matchesUser,
-  }
-}
+  };
+};
 
 export const MatchMakingService = {
-  findSuggestedMatches,
   getSuggestedUsers,
   getUserDetails,
 }
