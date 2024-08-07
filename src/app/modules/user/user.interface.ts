@@ -50,7 +50,7 @@ export type IUser = {
     religion?: number
     joinFamilyLiving?: number
     education?: number
-    ageRange?: number
+    ageRange?: [number, number];
     wantChildren?: number
   }
 }

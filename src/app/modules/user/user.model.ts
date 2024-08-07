@@ -12,11 +12,12 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
     role: {
       type: String,
       required: true,
+      enum: ['user', 'admin'],
     },
     password: {
       type: String,
       required: true,
-      select: 0,
+      select: false,
     },
     needsPasswordChange: {
       type: Boolean,
@@ -59,7 +60,7 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
       type: String,
     },
     age: {
-      type: String,
+      type: Number,
     },
     sex: {
       type: String,
@@ -148,7 +149,30 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
     pendingUpdates: {
       type: Schema.Types.Mixed,
     },
-    updateStatusMessage: { type: String, default: '' },
+    updateStatusMessage: {
+      type: String,
+      default: '',
+    },
+    preferences: {
+      looks: {
+        type: Number,
+      },
+      religion: {
+        type: Number,
+      },
+      joinFamilyLiving: {
+        type: Number,
+      },
+      education: {
+        type: Number,
+      },
+      ageRange: {
+        type: [Number],
+      },
+      wantChildren: {
+        type: Number,
+      },
+    },
   },
   {
     timestamps: true,
