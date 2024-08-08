@@ -120,7 +120,12 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
       type: String,
     },
     partnerAgeCompare: {
-      type: String,
+      minAge:{
+        type: Number,
+      },
+      maxAge:{
+        type: Number,
+      }
     },
     reloacte: {
       type: String,

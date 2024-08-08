@@ -35,7 +35,10 @@ export type IUser = {
   partnerGeneratingIncom?: string
   socialHabits?: string
   partnersFamilyBackground?: string
-  partnerAgeCompare?: string
+  partnerAgeCompare?: {
+    minAge:number
+    maxAge:number
+  }
   reloacte?: 'yes' | 'no'
   supportPartnerWithElderlyParents?: 'yes' | 'no'
   investLongTermRelationship?: 'yes' | 'no'

@@ -20,7 +20,6 @@ const getSuggestedUsers = async (
     let primaryScore = 0
     let secondaryScore = 0
 
-
     if (preferences.looks && potentialMatch.preferences.looks) {
       primaryScore +=
         preferences.looks === potentialMatch.preferences.looks
@@ -49,10 +48,13 @@ const getSuggestedUsers = async (
           ? 6 - preferences.education
           : 0
     }
-    if (preferences.ageRange && potentialMatch.age) {
+    if (preferences.ageRange && potentialMatch.partnerAgeCompare) {
       const [minAge, maxAge] = preferences.ageRange
       primaryScore +=
-        potentialMatch.age >= minAge && potentialMatch.age <= maxAge ? 6 - 5 : 0
+        potentialMatch.partnerAgeCompare.minAge >= minAge &&
+        potentialMatch.partnerAgeCompare.maxAge <= maxAge
+          ? 6 - 5
+          : 0
     }
 
     if (
