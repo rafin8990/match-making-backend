@@ -1,4 +1,5 @@
 import { IGenericResponse } from '../../../interfaces/common'
+import { sendEmail } from '../user/user.constant'
 import { IUser } from '../user/user.interface'
 import { User } from '../user/user.model'
 
@@ -189,7 +190,35 @@ const getSuggestedUsers = async (
   }
 }
 
+const createMatch = async (userId: string, suggestedUserId: string) => {
+  const user = await User.findById(userId)
+  const suggestedUser = await User.findById(suggestedUserId)
+  if (!user || !suggestedUser) throw new Error('User not found')
+  await sendEmail(
+    `${user.email}, ${suggestedUser.email}`,
+    'New Match Request',
+    `You have a new match request. View details at: <URL>`
+  )
+}
+
+const handleMatchResponse = async (userId: string, matchUserId: string, action: 'pending' | 'accepted' | 'declined') => {
+  const user = await User.findById(userId);
+  const matchUser = await User.findById(matchUserId);
+  if (!user || !matchUser) throw new Error('User not found');
+
+  if (action === 'accepted') {
+    user.matches.push(matchUserId);
+    matchUser.matches.push(userId);
+    await user.save();
+    await matchUser.save();
+  }
+
+  // If declined, no need to do anything specific
+};
+
 export const MatchMakingService = {
   getSuggestedUsers,
   getUserDetails,
+  createMatch,
+  handleMatchResponse
 }
