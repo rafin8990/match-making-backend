@@ -20,8 +20,8 @@ const UpdateUserZodSchema = z.object({
     needsPasswordChange: z.boolean().optional(),
     isVerified: z.boolean().optional(),
     isUpdated: z.boolean().optional(),
+    is2Authenticate: z.boolean().optional(),
     isApproved: z.boolean().optional(),
-    isAuthenticate: z.boolean().optional(),
     name: z.string().optional(),
     address: z
       .object({
@@ -47,19 +47,37 @@ const UpdateUserZodSchema = z.object({
     sports: z.string().optional(),
     hobbies: z.string().optional(),
     comfortableLongDistance: z.enum(['yes', 'no']).optional(),
-    partnerGeneratingIncome: z.string().optional(),
+    partnerGeneratingIncom: z.string().optional(),
     socialHabits: z.string().optional(),
     partnersFamilyBackground: z.string().optional(),
-    partnerAgeCompare: z.string().optional(),
-    relocate: z.enum(['yes', 'no']).optional(),
+    partnerAgeCompare: z
+      .object({
+        minAge: z.number().optional(),
+        maxAge: z.number().optional(),
+      })
+      .optional(),
+    reloacte: z.enum(['yes', 'no']).optional(),
     supportPartnerWithElderlyParents: z.enum(['yes', 'no']).optional(),
     investLongTermRelationship: z.enum(['yes', 'no']).optional(),
     countriesVisited: z.number().optional(),
     immigratedYear: z.string().optional(),
     image: z.string().optional(),
     verificationCode: z.number().optional(),
+    pendingUpdates: z.any().optional(),
+    updateStatusMessage: z.string().optional(),
+    preferences: z
+      .object({
+        looks: z.number().optional(),
+        religion: z.number().optional(),
+        joinFamilyLiving: z.number().optional(),
+        education: z.number().optional(),
+        ageRange: z.array(z.number()).optional(),
+        wantChildren: z.number().optional(),
+      })
+      .optional(),
   }),
 })
+
 export const UserValidation = {
   createUserZodSchema,
   UpdateUserZodSchema,
