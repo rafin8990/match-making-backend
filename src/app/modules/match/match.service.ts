@@ -2,6 +2,8 @@ import { IGenericResponse } from '../../../interfaces/common'
 import { sendEmail } from '../user/user.constant'
 import { IUser } from '../user/user.interface'
 import { User } from '../user/user.model'
+import { IUserMatch } from './match.interface'
+import { Match } from './match.model'
 
 const getUserDetails = async (userId: string): Promise<IUser | null> => {
   return User.findById(userId).exec()
@@ -15,7 +17,6 @@ const getSuggestedUsers = async (
   const secondaryMatches: IUser[] = []
 
   const users = await User.find({}).exec()
-  console.log(users)
 
   users.forEach(potentialMatch => {
     let primaryScore = 0
@@ -190,35 +191,48 @@ const getSuggestedUsers = async (
   }
 }
 
-const createMatch = async (userId: string, suggestedUserId: string) => {
+const createMatch = async (
+  userId: string,
+  suggestedUserId: string,
+  url: string
+) => {
   const user = await User.findById(userId)
   const suggestedUser = await User.findById(suggestedUserId)
   if (!user || !suggestedUser) throw new Error('User not found')
   await sendEmail(
     `${user.email}, ${suggestedUser.email}`,
     'New Match Request',
-    `You have a new match request. View details at: <URL>`
+    `You have a new match request. View details at: ${url}`
   )
 }
 
-const handleMatchResponse = async (userId: string, matchUserId: string, action: 'pending' | 'accepted' | 'declined') => {
-  const user = await User.findById(userId);
-  const matchUser = await User.findById(matchUserId);
-  if (!user || !matchUser) throw new Error('User not found');
+const handleMatchResponse = async (
+  userId: string,
+  matchUserId: string,
+  action: 'pending' | 'accepted' | 'declined'
+): Promise<IUserMatch> => {
+  const user = await User.findById(userId)
+  const matchUser = await User.findById(matchUserId)
+  if (!user || !matchUser) throw new Error('User not found')
 
   if (action === 'accepted') {
-    user.matches.push(matchUserId);
-    matchUser.matches.push(userId);
-    await user.save();
-    await matchUser.save();
+    user?.matches.push(matchUserId)
+    matchUser?.matches.push(userId)
+    await user.save()
+    await matchUser.save()
   }
-
-  // If declined, no need to do anything specific
-};
+  const data = {
+    userId,
+    matchUserId,
+    action,
+  }  
+  const result = await Match.create(data)
+  return result
+}
 
 export const MatchMakingService = {
   getSuggestedUsers,
   getUserDetails,
   createMatch,
-  handleMatchResponse
+  handleMatchResponse,
 }

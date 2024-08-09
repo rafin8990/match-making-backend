@@ -120,12 +120,12 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
       type: String,
     },
     partnerAgeCompare: {
-      minAge:{
+      minAge: {
         type: Number,
       },
-      maxAge:{
+      maxAge: {
         type: Number,
-      }
+      },
     },
     reloacte: {
       type: String,
@@ -178,6 +178,7 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
         type: Number,
       },
     },
+    matches: [{ type: Schema.Types.ObjectId, ref: 'User' }]
   },
   {
     timestamps: true,

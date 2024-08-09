@@ -1,8 +1,9 @@
-import { Model } from 'mongoose'
+import { Model, Types } from 'mongoose'
+import { IUser } from '../user/user.interface'
 export type IUserMatch = {
-  userId: string
-  suggestedUserId: string
+  userId: Types.ObjectId | IUser
+  matchesUserId: Types.ObjectId | IUser
   action: 'pending' | 'accepted' | 'declined'
 }
 
-export type userModel = Model<IUserMatch, Record<string, unknown>>
+export type matchModel = Model<IUserMatch, Record<string, unknown>>

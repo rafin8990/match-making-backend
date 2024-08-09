@@ -55,7 +55,8 @@ export type IUser = {
     education?: number
     ageRange?: [number, number];
     wantChildren?: number
-  }
+  },
+  matches:string[]
 }
 
 export type IUserMethod = {
