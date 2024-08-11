@@ -193,39 +193,47 @@ const getSuggestedUsers = async (
 
 const createMatch = async (
   userId: string,
-  suggestedUserId: string,
-  url: string
-) => {
+  suggestedUserId: string
+): Promise<IUserMatch | undefined> => {
   const user = await User.findById(userId)
   const suggestedUser = await User.findById(suggestedUserId)
   if (!user || !suggestedUser) throw new Error('User not found')
+  const url = `https://matchmacking-platform.netlify.app`
   await sendEmail(
-    `${user.email}, ${suggestedUser.email}`,
+    `${user.email}`,
     'New Match Request',
-    `You have a new match request. View details at: ${url}`
+    `You have a new match request. View details at: ${url}/${userId} `
   )
+  await sendEmail(
+    `${suggestedUser.email}`,
+    'New Match Request',
+    `You have a new match request. View details at: ${url}/${suggestedUserId} `
+  )
+  const data = {
+    userId,
+    suggestedUser,
+    action: 'pending',
+  }
+  const result = await Match.create(data)
+  return result
 }
 
-const handleMatchResponse = async (
+const handleAccept = async (
   userId: string,
   matchUserId: string,
   action: 'pending' | 'accepted' | 'declined'
 ): Promise<IUserMatch> => {
   const user = await User.findById(userId)
   const matchUser = await User.findById(matchUserId)
-  if (!user || !matchUser) throw new Error('User not found')
-
-  if (action === 'accepted') {
-    user?.matches.push(matchUserId)
-    matchUser?.matches.push(userId)
-    await user.save()
-    await matchUser.save()
-  }
+  if (!user || !matchUser) throw new Error('User not found') 
+  user?.matches.push(matchUserId)
+  await user.save()
+  await matchUser.save()
   const data = {
     userId,
     matchUserId,
-    action,
-  }  
+    action, 
+  }
   const result = await Match.create(data)
   return result
 }
@@ -234,5 +242,5 @@ export const MatchMakingService = {
   getSuggestedUsers,
   getUserDetails,
   createMatch,
-  handleMatchResponse,
+  handleAccept,
 }

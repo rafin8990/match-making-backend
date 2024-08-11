@@ -34,11 +34,10 @@ const getSuggestions = catchAsync(async (req: Request, res: Response) => {
 })
 
 const createMatch = catchAsync(async (req: Request, res: Response) => {
-  const { userId, suggestedUserId, url } = req.body
+  const { userId, suggestedUserId } = req.body
   const result = await MatchMakingService.createMatch(
     userId,
     suggestedUserId,
-    url
   )
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -48,9 +47,9 @@ const createMatch = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
-const handleMatchResponse = catchAsync(async (req: Request, res: Response) => {
+const handleAccept= catchAsync(async (req: Request, res: Response) => {
   const { userId, matchUserId, action } = req.body
-  const result = await MatchMakingService.handleMatchResponse(
+  const result = await MatchMakingService.handleAccept(
     userId,
     matchUserId,
     action
@@ -66,5 +65,5 @@ export const MatchMakingController = {
   getUser,
   getSuggestions,
   createMatch,
-  handleMatchResponse,
+  handleAccept,
 }

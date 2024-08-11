@@ -33,4 +33,4 @@ const matchSchema = new Schema<IUserMatch, Record<string, never>>(
 
 
 
-export const Match = model<IUserMatch, matchModel>('User', matchSchema)
+export const Match = model<IUserMatch, matchModel>('Match', matchSchema)
