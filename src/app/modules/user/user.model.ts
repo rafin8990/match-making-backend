@@ -64,12 +64,15 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
     },
     sex: {
       type: String,
-      enum: ['male', 'female', 'other'],
+      enum: ['Male', 'Female', 'Other'],
     },
     height: {
       type: String,
     },
     dateOfBirth: {
+      type: String,
+    },
+    birth_country: {
       type: String,
     },
     birthPlace: {
