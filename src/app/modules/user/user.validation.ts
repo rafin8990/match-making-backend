@@ -8,6 +8,7 @@ const createUserZodSchema = z.object({
     needsPasswordChange: z.boolean().optional(),
     passwordChangedAt: z.date().optional(),
     isVerified: z.boolean().optional(),
+    phoneNumber: z.string().nullable().optional(),
   }),
 })
 
@@ -35,6 +36,7 @@ const UpdateUserZodSchema = z.object({
     sex: z.enum(['male', 'female', 'other']).optional(),
     height: z.string().optional(),
     dateOfBirth: z.string().optional(),
+    birth_country: z.string().optional(),
     birthPlace: z.string().optional(),
     education: z.enum(['college', 'high school', 'other']).optional(),
     educationDetails: z.string().optional(),

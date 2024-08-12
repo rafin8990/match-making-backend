@@ -20,6 +20,7 @@ export type IUser = {
   sex?: 'male' | 'female' | 'other'
   height?: string
   dateOfBirth?: string
+  birth_country?:string
   birthPlace?: string
   education?: 'college' | 'high school' | 'other'
   educationDetails?: string
