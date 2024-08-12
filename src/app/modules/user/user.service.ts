@@ -38,6 +38,7 @@ const createUser = async (user: IUser): Promise<IUser> => {
     `WelCome To matchmaking Platform . Your password is: ${password2}`
   )
   const result = await User.create(user)
+
   return result
 }
 
