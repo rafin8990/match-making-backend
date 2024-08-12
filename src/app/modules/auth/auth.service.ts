@@ -50,7 +50,7 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
     await sendVerificationCode(email, subject, text)
   }
 
- 
+
   // Create access and refresh tokens
   const accessToken = jwtHelpers.createToken(
     { email: user.email, role: user.role, id: user._id, name: user.name },
@@ -84,14 +84,14 @@ const refreshToken = async (token: string): Promise<IRefreshTokenResponse> => {
   }
 
   // checking deleted users refresh token
-  const { email } = verifiedToken
-  const isUserExist = await user.isUserExist(email)
+  const { id } = verifiedToken
+  const isUserExist = await user.isUserExist(id)
   if (!isUserExist) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist')
   }
   // generate new token
   const newAccessToken = jwtHelpers.createToken(
-    { id: isUserExist?.email, role: isUserExist?.role },
+    { email: isUserExist?.email, role: isUserExist?.role },
     config.jwt_secret as Secret,
     config.jwt_expires_in as string
   )
@@ -212,7 +212,7 @@ const verify2FA = async (
   user.verificationCode = null
   await user.save()
 
- return user;
+  return user;
 }
 
 export const AuthService = {

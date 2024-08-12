@@ -49,7 +49,7 @@ export type IUser = {
   verificationCode?: number | null
   pendingUpdates?: Partial<IUser>
   updateStatusMessage?: string
-  preferences: {
+  preferences?: {
     looks?: number
     religion?: number
     joinFamilyLiving?: number
