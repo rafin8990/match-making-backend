@@ -6,9 +6,9 @@ export type IUser = {
   passwordChangedAt?: Date
   needsPasswordChange: true | false
   isVerified: true | false
-  isUpdated: true | false
-  isApproved: true | false
-  is2Authenticate: true | false
+  isUpdated?: true | false
+  isApproved?: true | false
+  is2Authenticate?: true | false
   name?: string
   address?: {
     city?: string
@@ -20,6 +20,7 @@ export type IUser = {
   sex?: 'male' | 'female' | 'other'
   height?: string
   dateOfBirth?: string
+  birth_country?:string
   birthPlace?: string
   education?: 'college' | 'high school' | 'other'
   educationDetails?: string
