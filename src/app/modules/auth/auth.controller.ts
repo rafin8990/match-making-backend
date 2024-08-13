@@ -109,10 +109,21 @@ const verify2FA = async (req: Request, res: Response) => {
   })
 }
 
+const signOutUser = catchAsync(async (req: Request, res: Response) => {
+  res.clearCookie('refreshToken'); 
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User signed out successfully',
+  });
+});
+
 export const AuthController = {
   loginUser,
   refreshToken,
   changePassword,
   forgetPassword,
   verify2FA,
+  signOutUser
 }

@@ -24,6 +24,7 @@ router.post(
   validateRequest(AuthValidation.forgetPasswordZodSchema),
   AuthController.forgetPassword
 )
+router.post('/signout', AuthController.signOutUser)
 router.post(
   '/verify-2FA',
   validateRequest(AuthValidation.verify2FAZodSchema),

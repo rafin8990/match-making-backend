@@ -211,7 +211,7 @@ const createMatch = async (
   )
   const data = {
     userId,
-    suggestedUser,
+    suggestedUserId,
     action: 'pending',
   }
   const result = await Match.create(data)
@@ -228,11 +228,11 @@ const handleAccept = async (
   if (!user || !matchUser) throw new Error('User not found') 
   user?.matches.push(matchUserId)
   await user.save()
-  await matchUser.save()
+  await matchUser.save()        
   const data = {
     userId,
     matchUserId,
-    action, 
+    action,  
   }
   const result = await Match.create(data)
   return result
