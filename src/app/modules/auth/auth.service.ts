@@ -53,13 +53,13 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
  
   // Create access and refresh tokens
   const accessToken = jwtHelpers.createToken(
-    { email: user.email, role: user.role, id: user._id, name: user.name },
+    { email: user.email, role: user.role, id: user._id, name: user.name, isApproved:user.isApproved },
     config.jwt_secret as string,
     config.jwt_expires_in as string
   )
 
   const refreshToken = jwtHelpers.createToken(
-    { email: user.email, role: user.role, id: user._id, name: user.name },
+    { email: user.email, role: user.role, id: user._id, name: user.name, isApproved:user.isApproved },
     config.jwt_refresh_secret as string,
     config.jwt_refresh_expires_in as string
   )
