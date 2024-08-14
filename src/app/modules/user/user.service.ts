@@ -154,17 +154,18 @@ const submitUserUpdate = async (
 
 const approveUserUpdate = async (id: string): Promise<IUser | null> => {
   const user = await User.findById(id)
+  // console.log(user)
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found')
   }
-
+  user.isApproved = true
   if (user.pendingUpdates) {
     Object.assign(user, user.pendingUpdates)
     user.pendingUpdates = undefined
     user.isUpdated = true
     await user.save()
   }
-
+  await user.save();
   return user
 }
 
