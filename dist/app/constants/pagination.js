@@ -6,6 +6,4 @@ exports.paginationFields = [
     'limit',
     'sortBy',
     'sortOrder',
-    'maxPrice',
-    'minPrice',
 ];

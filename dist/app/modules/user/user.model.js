@@ -13,12 +13,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
-/* eslint-disable @typescript-eslint/no-this-alias */
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const mongoose_1 = require("mongoose");
-const config_1 = __importDefault(require("../../../config"));
 const userSchema = new mongoose_1.Schema({
-    phoneNumber: {
+    email: {
         type: String,
         required: true,
         unique: true,
@@ -26,48 +24,190 @@ const userSchema = new mongoose_1.Schema({
     role: {
         type: String,
         required: true,
-        enum: ['seller', 'buyer', 'admin'],
+        enum: ['user', 'admin'],
     },
     password: {
         type: String,
         required: true,
-        select: 0,
-    },
-    name: {
-        firstName: {
-            type: String,
-            required: true,
-        },
-        lastName: {
-            type: String,
-            required: true,
-        },
-    },
-    address: {
-        type: String,
-        required: true,
-    },
-    budget: {
-        type: Number,
-    },
-    income: {
-        type: Number,
+        select: false,
     },
     needsPasswordChange: {
         type: Boolean,
         default: true,
     },
+    passwordChangedAt: {
+        type: Date,
+    },
+    isVerified: {
+        type: Boolean,
+        default: false,
+    },
+    isUpdated: {
+        type: Boolean,
+        default: false,
+    },
+    is2Authenticate: {
+        type: Boolean,
+        default: false,
+    },
+    isApproved: {
+        type: Boolean,
+        default: false,
+    },
+    name: {
+        type: String,
+    },
+    address: {
+        city: {
+            type: String,
+        },
+        state: {
+            type: String,
+        },
+        country: {
+            type: String,
+        },
+    },
+    phoneNumber: {
+        type: String,
+    },
+    age: {
+        type: Number,
+    },
+    sex: {
+        type: String,
+        enum: ['Male', 'Female', 'Other'],
+    },
+    height: {
+        type: String,
+    },
+    dateOfBirth: {
+        type: String,
+    },
+    birth_country: {
+        type: String,
+    },
+    birthPlace: {
+        type: String,
+    },
+    education: {
+        type: String,
+        enum: ['college', 'high school', 'other'],
+    },
+    educationDetails: {
+        type: String,
+    },
+    profession: {
+        type: String,
+    },
+    currentJob: {
+        type: String,
+    },
+    language: {
+        type: String,
+    },
+    jamatkhanaAttendence: {
+        type: String,
+    },
+    haveChildren: {
+        type: Boolean,
+    },
+    personality: {
+        type: String,
+    },
+    sports: {
+        type: String,
+    },
+    hobbies: {
+        type: String,
+    },
+    comfortableLongDistance: {
+        type: String,
+        enum: ['yes', 'no'],
+    },
+    partnerGeneratingIncom: {
+        type: String,
+    },
+    socialHabits: {
+        type: String,
+    },
+    partnersFamilyBackground: {
+        type: String,
+    },
+    partnerAgeCompare: {
+        minAge: {
+            type: Number,
+        },
+        maxAge: {
+            type: Number,
+        },
+    },
+    reloacte: {
+        type: String,
+        enum: ['yes', 'no'],
+    },
+    supportPartnerWithElderlyParents: {
+        type: String,
+        enum: ['yes', 'no'],
+    },
+    investLongTermRelationship: {
+        type: String,
+        enum: ['yes', 'no'],
+    },
+    countriesVisited: {
+        type: Number,
+    },
+    immigratedYear: {
+        type: String,
+    },
+    image: {
+        type: String,
+    },
+    verificationCode: {
+        type: Number,
+    },
+    pendingUpdates: {
+        type: mongoose_1.Schema.Types.Mixed,
+    },
+    updateStatusMessage: {
+        type: String,
+        default: '',
+    },
+    preferences: {
+        looks: {
+            type: Number,
+        },
+        religion: {
+            type: Number,
+        },
+        joinFamilyLiving: {
+            type: Number,
+        },
+        education: {
+            type: Number,
+        },
+        ageRange: {
+            type: [Number],
+        },
+        wantChildren: {
+            type: Number,
+        },
+    },
+    matches: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'User' }]
 }, {
     timestamps: true,
+    toJSON: {
+        virtuals: true,
+    },
 });
-userSchema.methods.isUserExist = function (phoneNumber) {
+userSchema.methods.isUserExist = function (email) {
     return __awaiter(this, void 0, void 0, function* () {
-        const user = yield exports.User.findOne({ phoneNumber }, {
-            _id: 1,
-            phoneNumber: 1,
+        const user = yield exports.User.findOne({ email }, {
+            email: 1,
             password: 1,
             role: 1,
             needsPasswordChange: 1,
+            isVerified: 1,
         });
         return user;
     });
@@ -78,11 +218,11 @@ userSchema.methods.isPasswordMatched = function (givenPassword, savedPassword) {
         return isMatched;
     });
 };
-userSchema.pre('save', function (next) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const user = this;
-        user.password = yield bcrypt_1.default.hash(user.password, Number(config_1.default.bcrypt_salt_round));
-        next();
-    });
-});
+// userSchema.pre('save', async function (next) {
+//   this.password = await bcrypt.hash(
+//     this.password,
+//     Number(config.bycrypt_sault_round),
+//   );
+//   next();
+// });
 exports.User = (0, mongoose_1.model)('User', userSchema);

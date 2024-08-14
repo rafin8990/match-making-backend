@@ -7,11 +7,15 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const path_1 = __importDefault(require("path"));
 dotenv_1.default.config({ path: path_1.default.join(process.cwd(), '.env') });
 exports.default = {
-    env: process.env.NODE_ENV,
     port: process.env.PORT,
     database_url: process.env.DATABASE_URL,
-    default_user_password: process.env.DEFAULT_USER_PASSWORD,
-    bcrypt_salt_round: process.env.BCRYPT_SALT_ROUNDS,
+    bycrypt_sault_round: process.env.BCRYPT_SAULT_ROUND,
+    env: process.env.NODE_ENV,
+    emailHost: process.env.EMAIL_HOST || 'http://localhost:5000/',
+    emailPort: process.env.EMAIL_PORT || 587,
+    emailUser: process.env.EMAIL_USER,
+    emailPassword: process.env.EMAIL_PASSWORD,
+    emailFrom: process.env.EMAIL_FROM,
     jwt_secret: process.env.JWT_SECRET,
     jwt_expires_in: process.env.JWT_EXPIRES_IN,
     jwt_refresh_secret: process.env.JWT_REFRESH_SECRET,

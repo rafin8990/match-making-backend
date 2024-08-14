@@ -25,8 +25,8 @@ function boostrap() {
         try {
             yield mongoose_1.default.connect(index_1.default.database_url);
             console.log(`🛢   Database is connected successfully`);
-            app_1.default.listen(index_1.default.port, () => {
-                console.log(`Application  listening on port ${index_1.default.port}`);
+            app_1.default.listen(5000, () => {
+                console.log(`Application  listening on port ${5000}`);
             });
         }
         catch (err) {
