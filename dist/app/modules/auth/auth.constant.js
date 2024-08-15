@@ -12,48 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendEmail = exports.generateRandomPassword = exports.UserFilterableFields = exports.UserSearchableFields = void 0;
+exports.sendVerificationCode = void 0;
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const nodemailer_smtp_transport_1 = __importDefault(require("nodemailer-smtp-transport"));
 const config_1 = __importDefault(require("../../../config"));
-exports.UserSearchableFields = [
-    '_id',
-    'email',
-    'name',
-    'email',
-    'address.country',
-    'address.city',
-    'address.state',
-    'phoneNumber',
-    'birthPlace',
-    'language',
-    'education',
-];
-exports.UserFilterableFields = [
-    'searchTerm',
-    '_id',
-    'email',
-    'name',
-    'email',
-    'address.country',
-    'address.city',
-    'address.state',
-    'phoneNumber',
-    'birthPlace',
-    'language',
-    'education',
-];
-const generateRandomPassword = () => {
-    const length = 8;
-    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let password = '';
-    for (let i = 0, n = charset.length; i < length; ++i) {
-        password += charset.charAt(Math.floor(Math.random() * n));
-    }
-    return password;
-};
-exports.generateRandomPassword = generateRandomPassword;
-const sendEmail = (to, subject, text) => __awaiter(void 0, void 0, void 0, function* () {
+const sendVerificationCode = (to, subject, text) => __awaiter(void 0, void 0, void 0, function* () {
     const transporter = nodemailer_1.default.createTransport((0, nodemailer_smtp_transport_1.default)({
         service: 'Gmail',
         auth: {
@@ -69,4 +32,4 @@ const sendEmail = (to, subject, text) => __awaiter(void 0, void 0, void 0, funct
     };
     yield transporter.sendMail(mailOptions);
 });
-exports.sendEmail = sendEmail;
+exports.sendVerificationCode = sendVerificationCode;

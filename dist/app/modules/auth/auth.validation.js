@@ -1,14 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LoginValidation = void 0;
+exports.AuthValidation = void 0;
 const zod_1 = require("zod");
-const loginZodSchema = zod_1.z.object({
+const LoginZodSchema = zod_1.z.object({
     body: zod_1.z.object({
-        phoneNumber: zod_1.z.string({
-            required_error: 'Phone number is required',
+        email: zod_1.z.string({
+            required_error: 'Email is required',
         }),
         password: zod_1.z.string({
-            required_error: 'password is required',
+            required_error: 'Password is required',
         }),
     }),
 });
@@ -19,7 +19,34 @@ const refreshTokenZodSchema = zod_1.z.object({
         }),
     }),
 });
-exports.LoginValidation = {
-    loginZodSchema,
+const changePasswordZodSchema = zod_1.z.object({
+    body: zod_1.z.object({
+        oldPassword: zod_1.z.string({
+            required_error: 'old Password is required',
+        }),
+        newPassword: zod_1.z.string({
+            required_error: 'New Password is required',
+        }),
+    }),
+});
+const forgetPasswordZodSchema = zod_1.z.object({
+    body: zod_1.z.object({
+        newPassword: zod_1.z.string({
+            required_error: 'New Password is required',
+        }),
+    }),
+});
+const verify2FAZodSchema = zod_1.z.object({
+    body: zod_1.z.object({
+        verificationCode: zod_1.z.number({
+            required_error: 'Verification code is required',
+        }),
+    }),
+});
+exports.AuthValidation = {
+    LoginZodSchema,
     refreshTokenZodSchema,
+    changePasswordZodSchema,
+    forgetPasswordZodSchema,
+    verify2FAZodSchema,
 };

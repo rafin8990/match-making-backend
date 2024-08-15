@@ -8,91 +8,110 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __rest = (this && this.__rest) || function (s, e) {
-    var t = {};
-    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t[p] = s[p];
-    if (s != null && typeof Object.getOwnPropertySymbols === "function")
-        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-                t[p[i]] = s[p[i]];
-        }
-    return t;
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserController = void 0;
+exports.userController = void 0;
 const http_status_1 = __importDefault(require("http-status"));
-const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const catchAsync_1 = __importDefault(require("../../../shared/catchAsync"));
+const pick_1 = __importDefault(require("../../../shared/pick"));
 const sendResponse_1 = __importDefault(require("../../../shared/sendResponse"));
+const pagination_1 = require("../../constants/pagination");
+const user_constant_1 = require("./user.constant");
 const user_service_1 = require("./user.service");
 const createUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const user = __rest(req.body, []);
-        const result = yield user_service_1.UsersService.createUser(user);
-        res.status(200).json({
-            success: true,
-            message: 'user create successfully',
-            data: result,
-        });
-    }
-    catch (error) {
-        if (error.code === 11000 &&
-            error.keyPattern &&
-            error.keyPattern.phoneNumber) {
-            // MongoDB duplicate key error
-            throw new ApiError_1.default(500, 'Phone Number already exist');
-        }
-    }
-}));
-const getAllUsers = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_service_1.UsersService.getAllUsers();
-    console.log(req.user);
+    const user = req.body;
+    const result = yield user_service_1.UserService.createUser(user);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
+        message: 'User created successfully',
         success: true,
-        message: 'Users retrieved successfully !',
         data: result,
     });
 }));
-const getSingleUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.params.id;
-    const result = yield user_service_1.UsersService.getSingleUser(id);
+const getAllUsers = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const filters = Object.assign(Object.assign({}, (0, pick_1.default)(req.query, user_constant_1.UserFilterableFields)), { searchTerm: req.query.searchTerm });
+    const paginationOptions = (0, pick_1.default)(req.query, pagination_1.paginationFields);
+    const result = yield user_service_1.UserService.getAllUsers(filters, paginationOptions);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
+        message: 'Users retrieved successfully',
         success: true,
-        message: 'User retrieved successfully !',
+        meta: result.meta,
+        data: result.data,
+    });
+}));
+const getSingleUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.params.id;
+    const result = yield user_service_1.UserService.getSingleUser(userId);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        message: 'User retrieved successfully',
+        success: true,
         data: result,
     });
 }));
 const updateUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.params.id;
-    const updatedData = req.body;
-    const result = yield user_service_1.UsersService.updateUser(id, updatedData);
+    const userId = req.params.id;
+    const updateData = req.body;
+    const result = yield user_service_1.UserService.updateUser(userId, updateData);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
+        message: 'User updated successfully',
         success: true,
-        message: 'User updated successfully !',
+        data: result,
+    });
+}));
+const submitUserUpdate = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.params.id;
+    const updateData = req.body;
+    const result = yield user_service_1.UserService.submitUserUpdate(userId, updateData);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        message: 'User update submitted successfully. Pending admin approval.',
+        success: true,
+        data: result,
+    });
+}));
+const approveUserUpdate = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.params.id;
+    const result = yield user_service_1.UserService.approveUserUpdate(userId);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        message: 'User update approved successfully.',
+        success: true,
+        data: result,
+    });
+}));
+const declineUserUpdate = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.params.id;
+    const { reason } = req.body;
+    const result = yield user_service_1.UserService.declineUserUpdate(userId, reason);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        message: 'User update request declined.',
+        success: true,
         data: result,
     });
 }));
 const deleteUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.params.id;
-    const result = yield user_service_1.UsersService.deleteUser(id);
+    const userId = req.params.id;
+    const result = yield user_service_1.UserService.deleteUser(userId);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
+        message: 'User deleted successfully',
         success: true,
-        message: 'User deleted successfully !',
         data: result,
     });
 }));
-exports.UserController = {
+exports.userController = {
     createUser,
     getAllUsers,
     getSingleUser,
     updateUser,
+    submitUserUpdate,
+    approveUserUpdate,
+    declineUserUpdate,
     deleteUser,
 };

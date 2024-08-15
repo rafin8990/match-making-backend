@@ -3,17 +3,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.userRoutes = void 0;
 const express_1 = __importDefault(require("express"));
-const users_1 = require("../../enums/users");
-const auth_1 = __importDefault(require("../../middlewares/auth"));
 const validateRequest_1 = __importDefault(require("../../middlewares/validateRequest"));
 const user_controller_1 = require("./user.controller");
 const user_validation_1 = require("./user.validation");
 const router = express_1.default.Router();
-router.post('/signup', (0, validateRequest_1.default)(user_validation_1.UserValidation.createUserZodSchema), user_controller_1.UserController.createUser);
-router.patch('/:id', (0, validateRequest_1.default)(user_validation_1.UserValidation.updateUserZodSchema), (0, auth_1.default)(users_1.ENUM_USER_ROLE.ADMIN), user_controller_1.UserController.updateUser);
-router.get('/', user_controller_1.UserController.getAllUsers);
-router.get('/:id', (0, auth_1.default)(users_1.ENUM_USER_ROLE.ADMIN), user_controller_1.UserController.getSingleUser);
-router.delete('/:id', (0, auth_1.default)(users_1.ENUM_USER_ROLE.ADMIN), user_controller_1.UserController.deleteUser);
-exports.default = router;
-//everything is okay
+router.post('/create-user', (0, validateRequest_1.default)(user_validation_1.UserValidation.createUserZodSchema), user_controller_1.userController.createUser);
+router.get('/', user_controller_1.userController.getAllUsers);
+router.get('/:id', user_controller_1.userController.getSingleUser);
+router.patch('/update/:id', (0, validateRequest_1.default)(user_validation_1.UserValidation.UpdateUserZodSchema), user_controller_1.userController.updateUser);
+router.patch('/submit-update/:id', user_controller_1.userController.submitUserUpdate);
+router.patch('/approve-update/:id', user_controller_1.userController.approveUserUpdate);
+router.patch('/decline-update/:id', user_controller_1.userController.declineUserUpdate);
+router.delete('/delete-user/:id', user_controller_1.userController.deleteUser);
+exports.userRoutes = router;
