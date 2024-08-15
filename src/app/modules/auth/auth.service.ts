@@ -26,6 +26,7 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
       role: 1,
       needsPasswordChange: 1,
       is2Authenticate: 1,
+      isApproved:1
     }
   )
 
@@ -35,10 +36,12 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
 
   const givenPassword = await bcrypt.compare(password, user?.password as string)
 
-  // console.log(givenPassword)
 
   if (!givenPassword) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Password did not match')
+  }
+  if (user.isApproved === false) {
+    throw new ApiError(httpStatus.NOT_ACCEPTABLE, 'Your Id is not verified.Please wait for verification')
   }
 
   if (user.is2Authenticate === true) {
@@ -50,16 +53,27 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
     await sendVerificationCode(email, subject, text)
   }
 
- 
   // Create access and refresh tokens
   const accessToken = jwtHelpers.createToken(
-    { email: user.email, role: user.role, id: user._id, name: user.name, isApproved:user.isApproved },
+    {
+      email: user.email,
+      role: user.role,
+      id: user._id,
+      name: user.name,
+      isApproved: user.isApproved,
+    },
     config.jwt_secret as string,
     config.jwt_expires_in as string
   )
 
   const refreshToken = jwtHelpers.createToken(
-    { email: user.email, role: user.role, id: user._id, name: user.name, isApproved:user.isApproved },
+    {
+      email: user.email,
+      role: user.role,
+      id: user._id,
+      name: user.name,
+      isApproved: user.isApproved,
+    },
     config.jwt_refresh_secret as string,
     config.jwt_refresh_expires_in as string
   )
@@ -212,7 +226,7 @@ const verify2FA = async (
   user.verificationCode = null
   await user.save()
 
- return user;
+  return user
 }
 
 export const AuthService = {
