@@ -42,7 +42,10 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
       type: Boolean,
       default: false,
     },
-    name: {
+    firstName: {
+      type: String,
+    },
+    lastName: {
       type: String,
     },
     address: {
@@ -148,7 +151,11 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
     immigratedYear: {
       type: String,
     },
-    image: {
+    images: {
+      type: [String],
+      default: []
+    },
+    selectedImage: {
       type: String,
     },
     verificationCode: {
@@ -214,6 +221,15 @@ userSchema.methods.isPasswordMatched = async function (
   const isMatched = await bcrypt.compare(givenPassword, savedPassword)
   return isMatched
 }
+
+userSchema.methods.addImage = async function (imageUrl: string): Promise<void> {
+  if (this.images.length >= 5) {
+    this.images.shift(); 
+  }
+  this.images.push(imageUrl);
+  this.selectedImage = imageUrl;
+  await this.save();
+};
 
 // userSchema.pre('save', async function (next) {
 //   this.password = await bcrypt.hash(

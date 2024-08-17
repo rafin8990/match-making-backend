@@ -115,6 +115,30 @@ const deleteUser = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
+const updatephoto = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id
+  const imageUrl = req.body
+  const result = await UserService.updatePhoto(id, imageUrl)
+
+  sendResponse<IUser>(res, {
+    statusCode: httpStatus.OK,
+    message: 'User photo updated successfully',
+    success: true,
+    data: result,
+  })
+})
+
+const toggleTwoFactor = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const { enable } = req.body;
+  const result = await UserService.toggleTwoFactorAuthentication(id, enable);
+  sendResponse<IUser>(res, {
+    statusCode: httpStatus.OK,
+    message: `Two-factor authentication ${enable ? 'enabled' : 'disabled'} successfully`,
+    success: true,
+    data: result,
+  });
+});
 export const userController = {
   createUser,
   getAllUsers,
@@ -124,4 +148,6 @@ export const userController = {
   approveUserUpdate,
   declineUserUpdate,
   deleteUser,
+  updatephoto,
+  toggleTwoFactor
 }

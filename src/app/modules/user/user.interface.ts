@@ -9,8 +9,9 @@ export type IUser = {
   isUpdated?: true | false
   isApproved?: true | false
   is2Authenticate?: true | false
-  name?: string
-  address?: {
+  firstName:string,
+  lastName:string
+    address?: {
     city?: string
     state?: string
     country?: string
@@ -45,7 +46,8 @@ export type IUser = {
   investLongTermRelationship?: 'yes' | 'no'
   countriesVisited?: number
   immigratedYear?: string
-  image?: string
+  selectedImage?: string
+  images?:string[]
   verificationCode?: number | null
   pendingUpdates?: Partial<IUser>
   updateStatusMessage?: string
@@ -66,6 +68,7 @@ export type IUserMethod = {
     givenPassword: string,
     savedPassword: string
   ): Promise<boolean>
+  addImage(imageUrl: string): Promise<void>;
 }
 
 export type userModel = Model<IUser, Record<string, unknown>, IUserMethod>

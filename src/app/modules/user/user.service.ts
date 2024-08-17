@@ -145,6 +145,13 @@ const submitUserUpdate = async (
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found')
   }
 
+  if (updateData.selectedImage) {
+    user.selectedImage = updateData.selectedImage;
+    if (user.images && user.images.length >= 5) {
+      user.images.shift();
+    }
+    user.images?.push(updateData.selectedImage); 
+  }
   user.pendingUpdates = { ...user.pendingUpdates, ...updateData }
   user.isUpdated = false
   await user.save()
@@ -207,6 +214,45 @@ const deleteUser = async (id: string): Promise<IUser | null> => {
   }
 }
 
+const updatePhoto=async(id:string,imageUrl:string):Promise<IUser| null>=>{
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'User not found')
+    }
+    await user.addImage(imageUrl);
+    return user
+  } catch (error) {
+    throw new ApiError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      'Unable to update photo'
+    )
+  }
+}
+
+
+const toggleTwoFactorAuthentication = async (
+  id: string,
+  enable: boolean
+): Promise<IUser | null> => {
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+    }
+    user.is2Authenticate = enable;
+    await user.save();
+    return user;
+  } catch (error) {
+    throw new ApiError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      'Unable to update two-factor authentication status'
+    );
+  }
+};
+
+
+
 export const UserService = {
   createUser,
   getAllUsers,
@@ -216,4 +262,6 @@ export const UserService = {
   approveUserUpdate,
   declineUserUpdate,
   deleteUser,
+  updatePhoto,
+  toggleTwoFactorAuthentication
 }

@@ -40,9 +40,6 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
   if (!givenPassword) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Password did not match')
   }
-  if (user.isApproved === false) {
-    throw new ApiError(httpStatus.NOT_ACCEPTABLE, 'Your Id is not verified.Please wait for verification')
-  }
 
   if (user.is2Authenticate === true) {
     const verificationCode = Math.floor(100000 + Math.random() * 900000)
@@ -59,8 +56,10 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
       email: user.email,
       role: user.role,
       id: user._id,
-      name: user.name,
+      firstName: user.firstName,
+      lastName:user.lastName,
       isApproved: user.isApproved,
+      is2Authenticate:user.is2Authenticate
     },
     config.jwt_secret as string,
     config.jwt_expires_in as string
@@ -71,8 +70,10 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
       email: user.email,
       role: user.role,
       id: user._id,
-      name: user.name,
+      firstName: user.firstName,
+      lastName:user.lastName,
       isApproved: user.isApproved,
+      is2Authenticate:user.is2Authenticate
     },
     config.jwt_refresh_secret as string,
     config.jwt_refresh_expires_in as string
