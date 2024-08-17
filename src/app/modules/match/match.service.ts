@@ -72,8 +72,11 @@ const getSuggestedUsers = async (
     if (user.education && potentialMatch.education) {
       secondaryScore += user.education === potentialMatch.education ? 1 : 0
     }
-    if (user.name && potentialMatch.name) {
-      secondaryScore += user.name === potentialMatch.name ? 1 : 0
+    if (user.firstName && potentialMatch.firstName) {
+      secondaryScore += user.firstName === potentialMatch.firstName ? 1 : 0
+    }
+    if (user.lastName && potentialMatch.lastName) {
+      secondaryScore += user.lastName === potentialMatch.lastName ? 1 : 0
     }
     if (user.dateOfBirth && potentialMatch.dateOfBirth) {
       secondaryScore += user.dateOfBirth === potentialMatch.dateOfBirth ? 1 : 0
