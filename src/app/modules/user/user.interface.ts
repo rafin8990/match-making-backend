@@ -41,7 +41,7 @@ export type IUser = {
     minAge:number
     maxAge:number
   }
-  reloacte?: 'yes' | 'no'
+  relocate?: 'yes' | 'no'
   supportPartnerWithElderlyParents?: 'yes' | 'no'
   investLongTermRelationship?: 'yes' | 'no'
   countriesVisited?: number
