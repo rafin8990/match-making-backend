@@ -42,7 +42,7 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
   }
 
   if (user.is2Authenticate === true) {
-    const verificationCode = Math.floor(100000 + Math.random() * 900000)
+    const verificationCode = Math.floor(1000 + Math.random() * 9000)
     const subject = 'Your Verification Code'
     const text = `Your verification code is ${verificationCode}. Please enter this code to  your login your profile.`
     user.verificationCode = verificationCode

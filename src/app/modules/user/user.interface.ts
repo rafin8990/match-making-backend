@@ -18,7 +18,7 @@ export type IUser = {
   }
   phoneNumber?: string
   age?: number
-  sex?: 'male' | 'female' | 'other'
+  sex?: string
   height?: string
   dateOfBirth?: string
   birth_country?:string
@@ -51,7 +51,7 @@ export type IUser = {
   verificationCode?: number | null
   pendingUpdates?: Partial<IUser>
   updateStatusMessage?: string
-  preferences: {
+  preferences?: {
     looks?: number
     religion?: number
     joinFamilyLiving?: number
@@ -59,7 +59,7 @@ export type IUser = {
     ageRange?: [number, number];
     wantChildren?: number
   },
-  matches:string[]
+  matches?:string[]
 }
 
 export type IUserMethod = {

@@ -67,7 +67,6 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
     },
     sex: {
       type: String,
-      enum: ['Male', 'Female', 'Other'],
     },
     height: {
       type: String,
@@ -163,6 +162,7 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
     },
     pendingUpdates: {
       type: Schema.Types.Mixed,
+      default:[]
     },
     updateStatusMessage: {
       type: String,
