@@ -25,7 +25,7 @@ router.post(
   AuthController.forgetPassword
 )
 router.post('/signout', AuthController.signOutUser)
-router.post(
+router.patch(
   '/verify-2FA',
   validateRequest(AuthValidation.verify2FAZodSchema),
   AuthController.verify2FA

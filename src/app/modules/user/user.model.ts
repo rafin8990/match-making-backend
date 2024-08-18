@@ -82,7 +82,6 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
     },
     education: {
       type: String,
-      enum: ['college', 'high school', 'other'],
     },
     educationDetails: {
       type: String,
@@ -113,7 +112,7 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
     },
     comfortableLongDistance: {
       type: String,
-      enum: ['yes', 'no'],
+
     },
     partnerGeneratingIncom: {
       type: String,
@@ -134,15 +133,15 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
     },
     relocate: {
       type: String,
-      enum: ['yes', 'no'],
+      
     },
     supportPartnerWithElderlyParents: {
       type: String,
-      enum: ['yes', 'no'],
+      
     },
     investLongTermRelationship: {
       type: String,
-      enum: ['yes', 'no'],
+      
     },
     countriesVisited: {
       type: Number,

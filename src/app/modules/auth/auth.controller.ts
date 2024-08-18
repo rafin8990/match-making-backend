@@ -59,7 +59,7 @@ const refreshToken: RequestHandler = catchAsync(
 )
 
 const changePassword = catchAsync(async (req: Request, res: Response) => {
-  const { ...passwordData } = req.body
+  const passwordData = req.body
   const token = req.headers.authorization as string
   const decoded = jwt.verify(token, config.jwt_secret as string) as JwtPayload
   const user = (req.user = decoded)
@@ -86,25 +86,23 @@ const forgetPassword = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
-const verify2FA = async (req: Request, res: Response) => {
-  const { ...verifyData } = req.body 
-  console.log(verifyData)
-  
+const verify2FA = catchAsync(async (req: Request, res: Response) => {
+  const verifyData = req.body
   const token = req.headers.authorization as string
   const decoded = jwt.verify(token, config.jwt_secret as string) as JwtPayload
   const user = (req.user = decoded)
-  const tokens = await AuthService.verify2FA(user,verifyData)
-  
+  const results = await AuthService.verify2FA(user, verifyData)
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Pin Matched Successfully',
-    data: tokens,
+    data: results,
   })
-}
+})
 
 const signOutUser = catchAsync(async (req: Request, res: Response) => {
-  res.clearCookie('refreshToken'); 
+  res.clearCookie('refreshToken');
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

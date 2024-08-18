@@ -23,7 +23,7 @@ export type IUser = {
   dateOfBirth?: string
   birth_country?:string
   birthPlace?: string
-  education?: 'college' | 'high school' | 'other'
+  education?: string
   educationDetails?: string
   profession?: string
   currentJob?: string
@@ -33,7 +33,7 @@ export type IUser = {
   personality?: string
   sports?: string
   hobbies?: string
-  comfortableLongDistance?: 'yes' | 'no'
+  comfortableLongDistance?: string
   partnerGeneratingIncom?: string
   socialHabits?: string
   partnersFamilyBackground?: string
@@ -41,9 +41,9 @@ export type IUser = {
     minAge:number
     maxAge:number
   }
-  relocate?: 'yes' | 'no'
-  supportPartnerWithElderlyParents?: 'yes' | 'no'
-  investLongTermRelationship?: 'yes' | 'no'
+  relocate?: string
+  supportPartnerWithElderlyParents?: string
+  investLongTermRelationship?: string
   countriesVisited?: number
   immigratedYear?: string
   selectedImage?: string

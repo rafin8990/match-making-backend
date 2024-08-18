@@ -26,7 +26,8 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
       role: 1,
       needsPasswordChange: 1,
       is2Authenticate: 1,
-      isApproved:1
+      isApproved: 1,
+      verificationCode: 1
     }
   )
 
@@ -57,9 +58,11 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
       role: user.role,
       id: user._id,
       firstName: user.firstName,
-      lastName:user.lastName,
+      lastName: user.lastName,
       isApproved: user.isApproved,
-      is2Authenticate:user.is2Authenticate
+      is2Authenticate: user.is2Authenticate,
+      verificationCode: user.verificationCode,
+      password: password
     },
     config.jwt_secret as string,
     config.jwt_expires_in as string
@@ -71,9 +74,11 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
       role: user.role,
       id: user._id,
       firstName: user.firstName,
-      lastName:user.lastName,
+      lastName: user.lastName,
       isApproved: user.isApproved,
-      is2Authenticate:user.is2Authenticate
+      is2Authenticate: user.is2Authenticate,
+      verificationCode: user.verificationCode,
+      password: password
     },
     config.jwt_refresh_secret as string,
     config.jwt_refresh_expires_in as string
@@ -120,72 +125,75 @@ const changePassword = async (
   user: JwtPayload | null,
   payload: IChangePassword
 ): Promise<IUser | null> => {
-  const { oldPassword, newPassword } = payload
-  const users = new User()
-  const isUserExist = await users.isUserExist(user?.email)
-  if (!isUserExist) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist')
+  const { oldPassword, newPassword } = payload;
+  // console.log(oldPassword,newPassword)
+  const email = user?.email;
+  const isUserExist = await User.findOne({ email: email },{password:1});
+
+
+
+  if (!isUserExist || !isUserExist.password) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist or password not set');
   }
 
-  // checking old pass
-  const passwordMatched = users.isPasswordMatched(
-    oldPassword,
-    isUserExist.password as string
-  )
-  if (isUserExist?.password && !passwordMatched) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Old Password did not matched')
+  const savedHashPassword = isUserExist.password;
+
+  const checkOldPassword = await bcrypt.compare(oldPassword, savedHashPassword);
+
+  if (!checkOldPassword) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Old Password did not match');
   }
 
-  // hash pass
+  // Hash new password
   const newHashPassword = await bcrypt.hash(
     newPassword,
     Number(config.bycrypt_sault_round)
-  )
-
-  const email = user?.email
+  );
 
   const updatedData = {
     password: newHashPassword,
     needsPasswordChange: false,
     passwordChangedAt: new Date(),
-  }
-  // update password
+  };
+
+  // Update password
   const updatedUser = await User.findOneAndUpdate(
     { email: email },
     {
       $set: updatedData,
-    }
-  )
+    },
+    { new: true } // return the updated document
+  );
 
   if (!updatedUser) {
     throw new ApiError(
       httpStatus.INTERNAL_SERVER_ERROR,
       'Failed to update password'
-    )
+    );
   }
 
-  return updatedUser
-}
+  return updatedUser;
+};
 
 const forgetPassword = async (
   payload: IForgetPassword
 ): Promise<IUser | null> => {
-  const {email, newPassword,confirmPassword } = payload
+  const { email, newPassword, confirmPassword } = payload
   const users = new User()
   const isUserExist = await users.isUserExist(email)
   if (!isUserExist) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist')
   }
 
-  if(newPassword !== confirmPassword){
-    throw new ApiError(httpStatus.BAD_REQUEST,"Password didn't match")
+  if (newPassword !== confirmPassword) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Password didn't match")
   }
   // hash pass
   const newHashPassword = await bcrypt.hash(
     newPassword,
     Number(config.bycrypt_sault_round)
   )
- 
+
   const updatedData = {
     password: newHashPassword,
     needsPasswordChange: false,
@@ -213,24 +221,30 @@ const verify2FA = async (
   userData: JwtPayload | null,
   verifyData: IVerifyData
 ): Promise<IUser> => {
-  const { verificationCode } = verifyData
-  const email = userData?.email
-  const user = await User.findOne({ email })
+  const { verificationCode } = verifyData;
+  const email = userData?.email;
 
+  if (!email) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Email not provided');
+  }
+
+  const user = await User.findOne({ email });
   if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist')
+    throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist');
   }
 
-  if (user.verificationCode !== verificationCode) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid verification code')
+  const savedCode = user?.verificationCode;
+  const checkVerificationCode = Number(savedCode) === Number(verificationCode);
+
+  if (!checkVerificationCode) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid verification code');
   }
 
-  user.verificationCode = null
-  await user.save()
+  user.verificationCode = null;
+  await user.save();
 
-  return user
+  return user;
 }
-
 export const AuthService = {
   loginUser,
   refreshToken,
