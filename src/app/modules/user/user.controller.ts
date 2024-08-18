@@ -68,15 +68,15 @@ const submitUserUpdate = catchAsync(async (req: Request, res: Response) => {
   const updateData: Partial<IUser> = req.body
   console.log(userId,updateData)
 
-  // const result = await UserService.submitUserUpdate(userId, updateData)
-  // // console.log(result)
+  const result = await UserService.submitUserUpdate(userId, updateData)
+  // console.log(result)
 
-  // sendResponse<IUser>(res, {
-  //   statusCode: httpStatus.OK,
-  //   message: 'User update submitted successfully. Pending admin approval.',
-  //   success: true,
-  //   data: result,
-  // })
+  sendResponse<IUser>(res, {
+    statusCode: httpStatus.OK,
+    message: 'User update submitted successfully. Pending admin approval.',
+    success: true,
+    data: result,
+  })
 })
 
 const approveUserUpdate = catchAsync(async (req: Request, res: Response) => {
