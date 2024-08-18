@@ -29,7 +29,7 @@ export type IUser = {
   currentJob?: string
   language?: string
   jamatkhanaAttendence?: string
-  haveChildren?: true | false
+  haveChildren?: string
   personality?: string
   sports?: string
   hobbies?: string

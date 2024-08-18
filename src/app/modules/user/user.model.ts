@@ -100,7 +100,7 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
       type: String,
     },
     haveChildren: {
-      type: Boolean,
+      type: String,
     },
     personality: {
       type: String,
