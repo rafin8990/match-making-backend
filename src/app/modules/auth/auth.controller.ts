@@ -87,7 +87,8 @@ const forgetPassword = catchAsync(async (req: Request, res: Response) => {
 })
 
 const verify2FA = async (req: Request, res: Response) => {
-  const { ...verifyData } = req.body
+  const { ...verifyData } = req.body 
+  console.log(verifyData)
   
   const token = req.headers.authorization as string
   const decoded = jwt.verify(token, config.jwt_secret as string) as JwtPayload
