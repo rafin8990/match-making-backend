@@ -33,7 +33,7 @@ const UpdateUserZodSchema = z.object({
       .optional(),
     phoneNumber: z.string().optional(),
     age: z.number().optional(),
-    sex: z.enum(['male', 'female', 'other']).optional(),
+    sex: z.string().optional(),
     height: z.string().optional(),
     dateOfBirth: z.string().optional(),
     birth_country: z.string().optional(),
@@ -58,7 +58,7 @@ const UpdateUserZodSchema = z.object({
         maxAge: z.number().optional(),
       })
       .optional(),
-    reloacte: z.enum(['yes', 'no']).optional(),
+    relocate: z.enum(['yes', 'no']).optional(),
     supportPartnerWithElderlyParents: z.enum(['yes', 'no']).optional(),
     investLongTermRelationship: z.enum(['yes', 'no']).optional(),
     countriesVisited: z.number().optional(),

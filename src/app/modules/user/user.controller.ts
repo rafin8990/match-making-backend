@@ -51,7 +51,8 @@ const getSingleUser = catchAsync(async (req: Request, res: Response) => {
 
 const updateUser = catchAsync(async (req: Request, res: Response) => {
   const userId = req.params.id
-  const updateData = req.body
+  const updateData = req.body 
+  console.log(updateData)
   const result = await UserService.updateUser(userId, updateData)
 
   sendResponse<IUser>(res, {
@@ -64,9 +65,11 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
 
 const submitUserUpdate = catchAsync(async (req: Request, res: Response) => {
   const userId = req.params.id
-  const updateData: Partial<IUser> = req.body 
+  const updateData: Partial<IUser> = req.body
+  // console.log(userId,updateData)
 
   const result = await UserService.submitUserUpdate(userId, updateData)
+  // console.log(result)
 
   sendResponse<IUser>(res, {
     statusCode: httpStatus.OK,

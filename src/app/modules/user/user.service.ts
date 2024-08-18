@@ -144,6 +144,7 @@ const submitUserUpdate = async (
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found')
   }
+  // console.log(updateData)
 
   if (updateData.selectedImage) {
     user.selectedImage = updateData.selectedImage;

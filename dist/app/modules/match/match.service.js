@@ -133,8 +133,8 @@ const getSuggestedUsers = (user) => __awaiter(void 0, void 0, void 0, function* 
             secondaryScore +=
                 user.partnerAgeCompare === potentialMatch.partnerAgeCompare ? 1 : 0;
         }
-        if (user.reloacte && potentialMatch.reloacte) {
-            secondaryScore += user.reloacte === potentialMatch.reloacte ? 1 : 0;
+        if (user.relocate && potentialMatch.relocate) {
+            secondaryScore += user.relocate === potentialMatch.relocate ? 1 : 0;
         }
         if (user.supportPartnerWithElderlyParents &&
             potentialMatch.supportPartnerWithElderlyParents) {

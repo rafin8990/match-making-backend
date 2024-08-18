@@ -142,7 +142,7 @@ const userSchema = new mongoose_1.Schema({
             type: Number,
         },
     },
-    reloacte: {
+    relocate: {
         type: String,
         enum: ['yes', 'no'],
     },

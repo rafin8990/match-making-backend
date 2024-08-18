@@ -67,7 +67,6 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
     },
     sex: {
       type: String,
-      enum: ['Male', 'Female', 'Other'],
     },
     height: {
       type: String,
@@ -101,7 +100,7 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
       type: String,
     },
     haveChildren: {
-      type: Boolean,
+      type: String,
     },
     personality: {
       type: String,
@@ -133,7 +132,7 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
         type: Number,
       },
     },
-    reloacte: {
+    relocate: {
       type: String,
       enum: ['yes', 'no'],
     },
@@ -163,6 +162,7 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
     },
     pendingUpdates: {
       type: Schema.Types.Mixed,
+      default:[]
     },
     updateStatusMessage: {
       type: String,

@@ -10,15 +10,15 @@ export type IUser = {
   isApproved?: true | false
   is2Authenticate?: true | false
   firstName:string,
-  lastName:string
-    address?: {
+  lastName:string,
+  address?: {
     city?: string
     state?: string
     country?: string
   }
   phoneNumber?: string
   age?: number
-  sex?: 'male' | 'female' | 'other'
+  sex?: string
   height?: string
   dateOfBirth?: string
   birth_country?:string
@@ -29,7 +29,7 @@ export type IUser = {
   currentJob?: string
   language?: string
   jamatkhanaAttendence?: string
-  haveChildren?: true | false
+  haveChildren?: string
   personality?: string
   sports?: string
   hobbies?: string
@@ -41,7 +41,7 @@ export type IUser = {
     minAge:number
     maxAge:number
   }
-  reloacte?: 'yes' | 'no'
+  relocate?: 'yes' | 'no'
   supportPartnerWithElderlyParents?: 'yes' | 'no'
   investLongTermRelationship?: 'yes' | 'no'
   countriesVisited?: number
@@ -51,7 +51,7 @@ export type IUser = {
   verificationCode?: number | null
   pendingUpdates?: Partial<IUser>
   updateStatusMessage?: string
-  preferences: {
+  preferences?: {
     looks?: number
     religion?: number
     joinFamilyLiving?: number
@@ -59,7 +59,7 @@ export type IUser = {
     ageRange?: [number, number];
     wantChildren?: number
   },
-  matches:string[]
+  matches?:string[]
 }
 
 export type IUserMethod = {
