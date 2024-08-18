@@ -10,8 +10,8 @@ export type IUser = {
   isApproved?: true | false
   is2Authenticate?: true | false
   firstName:string,
-  lastName:string
-    address?: {
+  lastName:string,
+  address?: {
     city?: string
     state?: string
     country?: string
@@ -41,7 +41,7 @@ export type IUser = {
     minAge:number
     maxAge:number
   }
-  reloacte?: 'yes' | 'no'
+  relocate?: 'yes' | 'no'
   supportPartnerWithElderlyParents?: 'yes' | 'no'
   investLongTermRelationship?: 'yes' | 'no'
   countriesVisited?: number

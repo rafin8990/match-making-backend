@@ -132,7 +132,7 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
         type: Number,
       },
     },
-    reloacte: {
+    relocate: {
       type: String,
       enum: ['yes', 'no'],
     },
