@@ -66,7 +66,7 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
 const submitUserUpdate = catchAsync(async (req: Request, res: Response) => {
   const userId = req.params.id
   const updateData: Partial<IUser> = req.body
-  console.log(userId,updateData)
+  // console.log(userId,updateData)
 
   const result = await UserService.submitUserUpdate(userId, updateData)
   // console.log(result)
