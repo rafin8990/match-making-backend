@@ -168,23 +168,24 @@ const changePassword = async (
 }
 
 const forgetPassword = async (
-  user: JwtPayload | null,
   payload: IForgetPassword
 ): Promise<IUser | null> => {
-  const { newPassword } = payload
+  const {email, newPassword,confirmPassword } = payload
   const users = new User()
-  const isUserExist = await users.isUserExist(user?.email)
+  const isUserExist = await users.isUserExist(email)
   if (!isUserExist) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist')
   }
 
+  if(newPassword !== confirmPassword){
+    throw new ApiError(httpStatus.BAD_REQUEST,"Password didn't match")
+  }
   // hash pass
   const newHashPassword = await bcrypt.hash(
     newPassword,
     Number(config.bycrypt_sault_round)
   )
-  const email = user?.email
-
+ 
   const updatedData = {
     password: newHashPassword,
     needsPasswordChange: false,
