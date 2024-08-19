@@ -4,6 +4,7 @@ import { JwtPayload, Secret } from 'jsonwebtoken'
 import config from '../../../config'
 import ApiError from '../../../errors/ApiError'
 import { jwtHelpers } from '../../../helper/jwtHelper'
+import { sendEmail } from '../user/user.constant'
 import { IUser } from '../user/user.interface'
 import { User } from '../user/user.model'
 import { sendVerificationCode } from './auth.constant'
@@ -27,7 +28,8 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
       needsPasswordChange: 1,
       is2Authenticate: 1,
       isApproved: 1,
-      verificationCode: 1
+      verificationCode: 1,
+      isFirstTime:1
     }
   )
 
@@ -36,7 +38,6 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
   }
 
   const givenPassword = await bcrypt.compare(password, user?.password as string)
-
 
   if (!givenPassword) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Password did not match')
@@ -62,7 +63,9 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
       isApproved: user.isApproved,
       is2Authenticate: user.is2Authenticate,
       verificationCode: user.verificationCode,
-      password: password
+      password: password,
+      isFirstTime:user.isFirstTime,
+      needsPasswordChange:user.needsPasswordChange
     },
     config.jwt_secret as string,
     config.jwt_expires_in as string
@@ -78,7 +81,9 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
       isApproved: user.isApproved,
       is2Authenticate: user.is2Authenticate,
       verificationCode: user.verificationCode,
-      password: password
+      password: password,
+      isFirstTime:user?.isFirstTime,
+      needsPasswordChange:user.needsPasswordChange
     },
     config.jwt_refresh_secret as string,
     config.jwt_refresh_expires_in as string
@@ -125,36 +130,39 @@ const changePassword = async (
   user: JwtPayload | null,
   payload: IChangePassword
 ): Promise<IUser | null> => {
-  const { oldPassword, newPassword } = payload;
+  const { oldPassword, newPassword } = payload
   // console.log(oldPassword,newPassword)
-  const email = user?.email;
-  const isUserExist = await User.findOne({ email: email },{password:1});
-
-
+  const email = user?.email
+  const isUserExist = await User.findOne({ email: email }, { password: 1})
 
   if (!isUserExist || !isUserExist.password) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist or password not set');
+    throw new ApiError(
+      httpStatus.NOT_FOUND,
+      'User does not exist or password not set'
+    )
   }
 
-  const savedHashPassword = isUserExist.password;
+  const savedHashPassword = isUserExist.password
 
-  const checkOldPassword = await bcrypt.compare(oldPassword, savedHashPassword);
+  const checkOldPassword = await bcrypt.compare(oldPassword, savedHashPassword)
 
   if (!checkOldPassword) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Old Password did not match');
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Old Password did not match')
   }
 
   // Hash new password
   const newHashPassword = await bcrypt.hash(
     newPassword,
     Number(config.bycrypt_sault_round)
-  );
+  )
+
+  const message = `Your Password changed successfully. Your new Password is ${newPassword}.Please do not shere your password with anyone.`
 
   const updatedData = {
     password: newHashPassword,
     needsPasswordChange: false,
     passwordChangedAt: new Date(),
-  };
+  }
 
   // Update password
   const updatedUser = await User.findOneAndUpdate(
@@ -163,17 +171,19 @@ const changePassword = async (
       $set: updatedData,
     },
     { new: true } // return the updated document
-  );
+  )
+
+  await sendEmail(email, 'Your Password changed', message)
 
   if (!updatedUser) {
     throw new ApiError(
       httpStatus.INTERNAL_SERVER_ERROR,
       'Failed to update password'
-    );
+    )
   }
 
-  return updatedUser;
-};
+  return updatedUser
+}
 
 const forgetPassword = async (
   payload: IForgetPassword
@@ -221,29 +231,29 @@ const verify2FA = async (
   userData: JwtPayload | null,
   verifyData: IVerifyData
 ): Promise<IUser> => {
-  const { verificationCode } = verifyData;
-  const email = userData?.email;
+  const { verificationCode } = verifyData
+  const email = userData?.email
 
   if (!email) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Email not provided');
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Email not provided')
   }
 
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email })
   if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist');
+    throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist')
   }
 
-  const savedCode = user?.verificationCode;
-  const checkVerificationCode = Number(savedCode) === Number(verificationCode);
+  const savedCode = user?.verificationCode
+  const checkVerificationCode = Number(savedCode) === Number(verificationCode)
 
   if (!checkVerificationCode) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid verification code');
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid verification code')
   }
 
-  user.verificationCode = null;
-  await user.save();
+  user.verificationCode = null
+  await user.save()
 
-  return user;
+  return user
 }
 export const AuthService = {
   loginUser,

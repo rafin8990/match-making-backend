@@ -9,6 +9,7 @@ export type IUser = {
   isUpdated?: true | false
   isApproved?: true | false
   is2Authenticate?: true | false
+  isFirstTime?: true | false
   firstName:string,
   lastName:string,
   address?: {

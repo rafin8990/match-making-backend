@@ -42,6 +42,10 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
       type: Boolean,
       default: false,
     },
+    isFirstTime: {
+      type: Boolean,
+      default: true,
+    },
     firstName: {
       type: String,
     },
