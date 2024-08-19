@@ -16,16 +16,6 @@ const messageSchema = new Schema<IMessage, Record<string, never>, IMessage>(
       type: String,
       required: true,
     },
-    isRead: {
-      type: Boolean
-    },
-    files: {
-      type: String
-    },
-    name: {
-      type: String
-    },
-    
   },
   {
     timestamps: true,

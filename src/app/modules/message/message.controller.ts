@@ -10,6 +10,7 @@ import { MessageService } from "./message.service"
 
 const createMessage = catchAsync(async (req: Request, res: Response) => {
     const Message = req.body
+    console.log(Message)
     const result = await MessageService.createMessage(Message)
     sendResponse(res, {
         statusCode: httpStatus.OK,

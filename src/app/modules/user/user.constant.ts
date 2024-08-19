@@ -47,7 +47,7 @@ export const generateRandomPassword = (): string => {
   return password
 }
 
-export const sendEmail = async (to: string, subject: string, text: string) => {
+export const sendEmail = async (to: string, subject: string, html: any) => {
   const transporter = nodemailer.createTransport(
     smtpTransport({
       service: 'Gmail',
@@ -61,7 +61,7 @@ export const sendEmail = async (to: string, subject: string, text: string) => {
     from: config.emailFrom,
     to,
     subject,
-    text,
+    html,
   }
 
   await transporter.sendMail(mailOptions)
