@@ -37,4 +37,4 @@ const messageSchema = new Schema<IMessage, Record<string, never>, IMessage>(
 
 
 
-export const Message = model<IMessage, messageModel>('User', messageSchema)
+export const Message = model<IMessage, messageModel>('Message', messageSchema)

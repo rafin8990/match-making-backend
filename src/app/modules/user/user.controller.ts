@@ -81,6 +81,7 @@ const submitUserUpdate = catchAsync(async (req: Request, res: Response) => {
 
 const approveUserUpdate = catchAsync(async (req: Request, res: Response) => {
   const userId = req.params.id
+  console.log("This user id is",userId);
   const result = await UserService.approveUserUpdate(userId)
   sendResponse<IUser>(res, {
     statusCode: httpStatus.OK,
