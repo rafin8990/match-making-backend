@@ -61,6 +61,8 @@ export type IUser = {
     wantChildren?: number
   },
   matches?:string[]
+  otpCode ?:string,
+  otpExpiration?:Date
 }
 
 export type IUserMethod = {

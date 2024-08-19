@@ -19,8 +19,6 @@ export type IChangePassword = {
 }
 export type IForgetPassword = {
   email:string
-  newPassword: string
-  confirmPassword:string
 }
 
 export type IVerifyData = {

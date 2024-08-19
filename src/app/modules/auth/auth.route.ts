@@ -19,11 +19,9 @@ router.post(
   validateRequest(AuthValidation.changePasswordZodSchema),
   AuthController.changePassword
 )
-router.post(
-  '/forget-password',
-  validateRequest(AuthValidation.forgetPasswordZodSchema),
-  AuthController.forgetPassword
-)
+router.post('/send-otp', AuthController.sendOTP)
+router.post('/verify-otp', AuthController.verifyOtpCode)
+router.post('/reset-password', AuthController.resetPassword)
 router.post('/signout', AuthController.signOutUser)
 router.patch(
   '/verify-2FA',

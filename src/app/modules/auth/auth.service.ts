@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import bcrypt from 'bcrypt'
+import crypto from 'crypto'
 import httpStatus from 'http-status'
 import { JwtPayload, Secret } from 'jsonwebtoken'
 import config from '../../../config'
@@ -10,7 +12,6 @@ import { User } from '../user/user.model'
 import { sendVerificationCode } from './auth.constant'
 import {
   IChangePassword,
-  IForgetPassword,
   ILoginUser,
   ILoginUserResponse,
   IRefreshTokenResponse,
@@ -29,7 +30,7 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
       is2Authenticate: 1,
       isApproved: 1,
       verificationCode: 1,
-      isFirstTime:1
+      isFirstTime: 1,
     }
   )
 
@@ -64,8 +65,8 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
       is2Authenticate: user.is2Authenticate,
       verificationCode: user.verificationCode,
       password: password,
-      isFirstTime:user.isFirstTime,
-      needsPasswordChange:user.needsPasswordChange
+      isFirstTime: user.isFirstTime,
+      needsPasswordChange: user.needsPasswordChange,
     },
     config.jwt_secret as string,
     config.jwt_expires_in as string
@@ -82,8 +83,8 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
       is2Authenticate: user.is2Authenticate,
       verificationCode: user.verificationCode,
       password: password,
-      isFirstTime:user?.isFirstTime,
-      needsPasswordChange:user.needsPasswordChange
+      isFirstTime: user?.isFirstTime,
+      needsPasswordChange: user.needsPasswordChange,
     },
     config.jwt_refresh_secret as string,
     config.jwt_refresh_expires_in as string
@@ -133,7 +134,7 @@ const changePassword = async (
   const { oldPassword, newPassword } = payload
   // console.log(oldPassword,newPassword)
   const email = user?.email
-  const isUserExist = await User.findOne({ email: email }, { password: 1})
+  const isUserExist = await User.findOne({ email: email }, { password: 1 })
 
   if (!isUserExist || !isUserExist.password) {
     throw new ApiError(
@@ -185,46 +186,64 @@ const changePassword = async (
   return updatedUser
 }
 
-const forgetPassword = async (
-  payload: IForgetPassword
-): Promise<IUser | null> => {
-  const { email, newPassword, confirmPassword } = payload
-  const users = new User()
-  const isUserExist = await users.isUserExist(email)
-  if (!isUserExist) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist')
+const sendOTP = async (email: string): Promise<IUser | null> => {
+  const user = await User.findOne({ email })
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User Does not exist')
   }
 
-  if (newPassword !== confirmPassword) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Password didn't match")
+  const otpCode = crypto.randomInt(1000, 9999).toString()
+  const otpExpiration = new Date(Date.now() + 2 * 60 * 1000)
+  user.otpCode = otpCode
+  user.otpExpiration = otpExpiration
+  await user.save()
+
+  const message = `Your OTP Verification code is ${otpCode}. This code is expired in two minutes.`
+  sendEmail(email, 'You Received an OTP Code', message)
+  return user
+}
+
+const verifyOtpCode = async (
+  email: string,
+  otpCode: string
+): Promise<IUser | null> => {
+  const user = await User.findOne({ email })
+  const date = new Date()
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist')
   }
-  // hash pass
-  const newHashPassword = await bcrypt.hash(
+  if (user.otpCode !== otpCode) {
+    throw new ApiError(httpStatus.BAD_REQUEST, ' OTP code did not match')
+  }
+  if (user.otpExpiration! < date) {
+    throw new ApiError(httpStatus.BAD_REQUEST, ' OTP code Expired')
+  }
+
+  user.otpCode = undefined
+  user.otpExpiration = undefined
+  await user.save()
+  return user
+}
+
+const resetPassword = async (
+  email: string,
+  newPassword: string,
+  confirmPassword:string
+): Promise<IUser | null> => {
+  const user = await User.findOne({ email }, { password: 1 })
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist')
+  }
+  if(newPassword !== confirmPassword){
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Password did not match')
+  }
+  const hashedPassword = await bcrypt.hash(
     newPassword,
     Number(config.bycrypt_sault_round)
   )
-
-  const updatedData = {
-    password: newHashPassword,
-    needsPasswordChange: false,
-    passwordChangedAt: new Date(),
-  }
-  // update password
-  const updatedUser = await User.findOneAndUpdate(
-    { email: email },
-    {
-      $set: updatedData,
-    }
-  )
-
-  if (!updatedUser) {
-    throw new ApiError(
-      httpStatus.INTERNAL_SERVER_ERROR,
-      'Failed to update password'
-    )
-  }
-
-  return updatedUser
+  user.password = hashedPassword
+  await user.save()
+  return user
 }
 
 const verify2FA = async (
@@ -259,6 +278,8 @@ export const AuthService = {
   loginUser,
   refreshToken,
   changePassword,
-  forgetPassword,
   verify2FA,
+  sendOTP,
+  verifyOtpCode,
+  resetPassword
 }

@@ -116,7 +116,6 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
     },
     comfortableLongDistance: {
       type: String,
-
     },
     partnerGeneratingIncom: {
       type: String,
@@ -137,15 +136,12 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
     },
     relocate: {
       type: String,
-      
     },
     supportPartnerWithElderlyParents: {
       type: String,
-      
     },
     investLongTermRelationship: {
       type: String,
-      
     },
     countriesVisited: {
       type: Number,
@@ -155,7 +151,7 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
     },
     images: {
       type: [String],
-      default: []
+      default: [],
     },
     selectedImage: {
       type: String,
@@ -165,7 +161,7 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
     },
     pendingUpdates: {
       type: Schema.Types.Mixed,
-      default:[]
+      default: [],
     },
     updateStatusMessage: {
       type: String,
@@ -191,7 +187,9 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
         type: Number,
       },
     },
-    matches: [{ type: Schema.Types.ObjectId, ref: 'User' }]
+    matches: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    otpCode: { type: String },
+    otpExpiration: { type: Date },
   },
   {
     timestamps: true,
@@ -227,12 +225,12 @@ userSchema.methods.isPasswordMatched = async function (
 
 userSchema.methods.addImage = async function (imageUrl: string): Promise<void> {
   if (this.images.length >= 5) {
-    this.images.shift(); 
+    this.images.shift()
   }
-  this.images.push(imageUrl);
-  this.selectedImage = imageUrl;
-  await this.save();
-};
+  this.images.push(imageUrl)
+  this.selectedImage = imageUrl
+  await this.save()
+}
 
 // userSchema.pre('save', async function (next) {
 //   this.password = await bcrypt.hash(
