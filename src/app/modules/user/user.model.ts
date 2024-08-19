@@ -86,6 +86,7 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
     },
     education: {
       type: String,
+
     },
     educationDetails: {
       type: String,
@@ -136,9 +137,11 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
     },
     relocate: {
       type: String,
+ 
     },
     supportPartnerWithElderlyParents: {
       type: String,
+
     },
     investLongTermRelationship: {
       type: String,
