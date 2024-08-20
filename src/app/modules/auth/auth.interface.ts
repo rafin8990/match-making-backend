@@ -4,7 +4,7 @@ export type ILoginUser = {
 }
 
 export type ILoginUserResponse = {
-  accessToken?: string
+  accessToken: string
   refreshToken?: string
   needsPasswordChange?: boolean
 }
@@ -18,7 +18,7 @@ export type IChangePassword = {
   newPassword: string
 }
 export type IForgetPassword = {
-  email:string
+  newPassword: string
 }
 
 export type IVerifyData = {

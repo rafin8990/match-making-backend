@@ -1,18 +1,28 @@
 
-import { Schema, Types, model } from 'mongoose'
+import { Schema, model } from 'mongoose'
 import { IUserMatch, matchModel } from './match.interface'
 
 
 const matchSchema = new Schema<IUserMatch, Record<string, never>>(
   {
     userId: {
-        type: Types.ObjectId,
+        type: String,
         ref: 'User',
         required: true,
       },
+      userAction: {
+        type: String,
+        enum: ['no', 'yes'],
+        required: true,
+      },
       matchesUserId: {
-        type: Types.ObjectId,
+        type: String,
         ref: 'User',
+        required: true,
+      },
+      matchesAction: {
+        type: String,
+        enum: ['no', 'yes'],
         required: true,
       },
       action: {

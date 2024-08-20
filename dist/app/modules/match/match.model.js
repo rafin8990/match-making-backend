@@ -4,13 +4,23 @@ exports.Match = void 0;
 const mongoose_1 = require("mongoose");
 const matchSchema = new mongoose_1.Schema({
     userId: {
-        type: mongoose_1.Types.ObjectId,
+        type: String,
         ref: 'User',
         required: true,
     },
+    userAction: {
+        type: String,
+        enum: ['no', 'yes'],
+        required: true,
+    },
     matchesUserId: {
-        type: mongoose_1.Types.ObjectId,
+        type: String,
         ref: 'User',
+        required: true,
+    },
+    matchesAction: {
+        type: String,
+        enum: ['no', 'yes'],
         required: true,
     },
     action: {

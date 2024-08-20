@@ -59,7 +59,7 @@ const UpdateUserZodSchema = zod_1.z.object({
             maxAge: zod_1.z.number().optional(),
         })
             .optional(),
-        relocate: zod_1.z.enum(['yes', 'no']).optional(),
+        reloacte: zod_1.z.enum(['yes', 'no']).optional(),
         supportPartnerWithElderlyParents: zod_1.z.enum(['yes', 'no']).optional(),
         investLongTermRelationship: zod_1.z.enum(['yes', 'no']).optional(),
         countriesVisited: zod_1.z.number().optional(),

@@ -44,7 +44,19 @@ const getAllUsers = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, vo
 }));
 const getSingleUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.params.id;
+    // console.log('userId', userId)
     const result = yield user_service_1.UserService.getSingleUser(userId);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        message: 'User retrieved successfully',
+        success: true,
+        data: result,
+    });
+}));
+const getUserByEmail = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userEmail = req.params.email;
+    // console.log('userId', userEmail)
+    const result = yield user_service_1.UserService.getUserByEmail(userEmail);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         message: 'User retrieved successfully',
@@ -105,13 +117,38 @@ const deleteUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, voi
         data: result,
     });
 }));
+const updatephoto = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const imageUrl = req.body;
+    const result = yield user_service_1.UserService.updatePhoto(id, imageUrl);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        message: 'User photo updated successfully',
+        success: true,
+        data: result,
+    });
+}));
+const toggleTwoFactor = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const { enable } = req.body;
+    const result = yield user_service_1.UserService.toggleTwoFactorAuthentication(id, enable);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        message: `Two-factor authentication ${enable ? 'enabled' : 'disabled'} successfully`,
+        success: true,
+        data: result,
+    });
+}));
 exports.userController = {
     createUser,
     getAllUsers,
+    getUserByEmail,
     getSingleUser,
     updateUser,
     submitUserUpdate,
     approveUserUpdate,
     declineUserUpdate,
     deleteUser,
+    updatephoto,
+    toggleTwoFactor
 };

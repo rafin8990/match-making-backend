@@ -54,7 +54,14 @@ const userSchema = new mongoose_1.Schema({
         type: Boolean,
         default: false,
     },
-    name: {
+    isFirstTime: {
+        type: Boolean,
+        default: true,
+    },
+    firstName: {
+        type: String,
+    },
+    lastName: {
         type: String,
     },
     address: {
@@ -76,7 +83,6 @@ const userSchema = new mongoose_1.Schema({
     },
     sex: {
         type: String,
-        enum: ['Male', 'Female', 'Other'],
     },
     height: {
         type: String,
@@ -92,7 +98,6 @@ const userSchema = new mongoose_1.Schema({
     },
     education: {
         type: String,
-        enum: ['college', 'high school', 'other'],
     },
     educationDetails: {
         type: String,
@@ -110,7 +115,7 @@ const userSchema = new mongoose_1.Schema({
         type: String,
     },
     haveChildren: {
-        type: Boolean,
+        type: String,
     },
     personality: {
         type: String,
@@ -123,7 +128,6 @@ const userSchema = new mongoose_1.Schema({
     },
     comfortableLongDistance: {
         type: String,
-        enum: ['yes', 'no'],
     },
     partnerGeneratingIncom: {
         type: String,
@@ -144,15 +148,12 @@ const userSchema = new mongoose_1.Schema({
     },
     relocate: {
         type: String,
-        enum: ['yes', 'no'],
     },
     supportPartnerWithElderlyParents: {
         type: String,
-        enum: ['yes', 'no'],
     },
     investLongTermRelationship: {
         type: String,
-        enum: ['yes', 'no'],
     },
     countriesVisited: {
         type: Number,
@@ -160,7 +161,11 @@ const userSchema = new mongoose_1.Schema({
     immigratedYear: {
         type: String,
     },
-    image: {
+    images: {
+        type: [String],
+        default: [],
+    },
+    selectedImage: {
         type: String,
     },
     verificationCode: {
@@ -168,6 +173,7 @@ const userSchema = new mongoose_1.Schema({
     },
     pendingUpdates: {
         type: mongoose_1.Schema.Types.Mixed,
+        default: [],
     },
     updateStatusMessage: {
         type: String,
@@ -193,7 +199,9 @@ const userSchema = new mongoose_1.Schema({
             type: Number,
         },
     },
-    matches: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'User' }]
+    matches: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'User' }],
+    otpCode: { type: String },
+    otpExpiration: { type: Date },
 }, {
     timestamps: true,
     toJSON: {
@@ -216,6 +224,16 @@ userSchema.methods.isPasswordMatched = function (givenPassword, savedPassword) {
     return __awaiter(this, void 0, void 0, function* () {
         const isMatched = yield bcrypt_1.default.compare(givenPassword, savedPassword);
         return isMatched;
+    });
+};
+userSchema.methods.addImage = function (imageUrl) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (this.images.length >= 5) {
+            this.images.shift();
+        }
+        this.images.push(imageUrl);
+        this.selectedImage = imageUrl;
+        yield this.save();
     });
 };
 // userSchema.pre('save', async function (next) {

@@ -1,8 +1,9 @@
-import { Model, Types } from 'mongoose'
-import { IUser } from '../user/user.interface'
+import { Model } from 'mongoose'
 export type IUserMatch = {
-  userId: Types.ObjectId | IUser
-  matchesUserId: Types.ObjectId | IUser
+  userId: string
+  userAction: 'no' | 'yes'
+  matchesUserId: string
+  matchesAction: 'no' | 'yes'
   action: 'pending' | 'accepted' | 'declined'
 }
 

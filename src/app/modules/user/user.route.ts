@@ -12,6 +12,7 @@ router.post(
 
 router.get('/', userController.getAllUsers)
 router.get('/:id', userController.getSingleUser)
+router.get('/email/:email', userController.getUserByEmail)
 router.patch(
   '/update/:id',
   validateRequest(UserValidation.UpdateUserZodSchema),
@@ -22,6 +23,6 @@ router.patch('/approve-update/:id', userController.approveUserUpdate)
 router.patch('/decline-update/:id', userController.declineUserUpdate)
 router.patch('/update-photo/:id', userController.updatephoto)
 router.delete('/delete-user/:id', userController.deleteUser)
-router.patch('/toggle-2fa/:id', userController.toggleTwoFactor);
+router.patch('/toggle-2fa/:id', userController.toggleTwoFactor)
 
 export const userRoutes = router

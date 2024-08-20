@@ -39,7 +39,20 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 
 const getSingleUser = catchAsync(async (req: Request, res: Response) => {
   const userId = req.params.id
+  // console.log('userId', userId)
   const result = await UserService.getSingleUser(userId)
+
+  sendResponse<IUser>(res, {
+    statusCode: httpStatus.OK,
+    message: 'User retrieved successfully',
+    success: true,
+    data: result,
+  })
+})
+const getUserByEmail = catchAsync(async (req: Request, res: Response) => {
+  const userEmail = req.params.email
+  // console.log('userId', userEmail)
+  const result = await UserService.getUserByEmail(userEmail)
 
   sendResponse<IUser>(res, {
     statusCode: httpStatus.OK,
@@ -51,8 +64,7 @@ const getSingleUser = catchAsync(async (req: Request, res: Response) => {
 
 const updateUser = catchAsync(async (req: Request, res: Response) => {
   const userId = req.params.id
-  const updateData = req.body 
-  console.log(updateData)
+  const updateData = req.body
   const result = await UserService.updateUser(userId, updateData)
 
   sendResponse<IUser>(res, {
@@ -66,10 +78,8 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
 const submitUserUpdate = catchAsync(async (req: Request, res: Response) => {
   const userId = req.params.id
   const updateData: Partial<IUser> = req.body
-  // console.log(userId,updateData)
 
   const result = await UserService.submitUserUpdate(userId, updateData)
-  // console.log(result)
 
   sendResponse<IUser>(res, {
     statusCode: httpStatus.OK,
@@ -81,7 +91,6 @@ const submitUserUpdate = catchAsync(async (req: Request, res: Response) => {
 
 const approveUserUpdate = catchAsync(async (req: Request, res: Response) => {
   const userId = req.params.id
-  console.log("This user id is",userId);
   const result = await UserService.approveUserUpdate(userId)
   sendResponse<IUser>(res, {
     statusCode: httpStatus.OK,
@@ -146,6 +155,7 @@ const toggleTwoFactor = catchAsync(async (req: Request, res: Response) => {
 export const userController = {
   createUser,
   getAllUsers,
+  getUserByEmail,
   getSingleUser,
   updateUser,
   submitUserUpdate,

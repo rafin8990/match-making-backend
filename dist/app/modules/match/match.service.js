@@ -12,7 +12,42 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MatchMakingService = void 0;
 const user_constant_1 = require("../user/user.constant");
 const user_model_1 = require("../user/user.model");
+// import { IUserMatch } from './match.interface'
 const match_model_1 = require("./match.model");
+const getAllMatchs = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield match_model_1.Match.find();
+    return result;
+});
+const getAllMatchesWithUserDetails = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Fetch all matches
+        const matches = yield match_model_1.Match.find();
+        if (!matches || matches.length === 0) {
+            console.log('No matches found');
+            return null;
+        }
+        // Initialize an array to store detailed match results
+        const detailedMatches = [];
+        // Iterate through each match to fetch user details
+        for (const match of matches) {
+            const user = yield user_model_1.User.findById(match.userId);
+            const matchedUser = yield user_model_1.User.findById(match.matchesUserId);
+            // Combine match data with user details
+            const detailedMatch = {
+                match,
+                userDetails: user || null,
+                matchedUserDetails: matchedUser || null,
+            };
+            detailedMatches.push(detailedMatch);
+        }
+        // console.log('Detailed matches with user info:', detailedMatches);
+        return detailedMatches;
+    }
+    catch (error) {
+        console.error('Error fetching matches with user details:', error);
+        throw error;
+    }
+});
 const getUserDetails = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     return user_model_1.User.findById(userId).exec();
 });
@@ -21,7 +56,7 @@ const getSuggestedUsers = (user) => __awaiter(void 0, void 0, void 0, function* 
     const primaryMatches = [];
     const secondaryMatches = [];
     const users = yield user_model_1.User.find({}).exec();
-    users.forEach(potentialMatch => {
+    users.forEach((potentialMatch) => {
         var _a, _b, _c, _d;
         let primaryScore = 0;
         let secondaryScore = 0;
@@ -69,8 +104,11 @@ const getSuggestedUsers = (user) => __awaiter(void 0, void 0, void 0, function* 
         if (user.education && potentialMatch.education) {
             secondaryScore += user.education === potentialMatch.education ? 1 : 0;
         }
-        if (user.name && potentialMatch.name) {
-            secondaryScore += user.name === potentialMatch.name ? 1 : 0;
+        if (user.firstName && potentialMatch.firstName) {
+            secondaryScore += user.firstName === potentialMatch.firstName ? 1 : 0;
+        }
+        if (user.lastName && potentialMatch.lastName) {
+            secondaryScore += user.lastName === potentialMatch.lastName ? 1 : 0;
         }
         if (user.dateOfBirth && potentialMatch.dateOfBirth) {
             secondaryScore += user.dateOfBirth === potentialMatch.dateOfBirth ? 1 : 0;
@@ -134,7 +172,7 @@ const getSuggestedUsers = (user) => __awaiter(void 0, void 0, void 0, function* 
                 user.partnerAgeCompare === potentialMatch.partnerAgeCompare ? 1 : 0;
         }
         if (user.relocate && potentialMatch.relocate) {
-            secondaryScore += user.relocate === potentialMatch.relocate ? 1 : 0;
+            secondaryScore += user.relocate === potentialMatch.reloacte ? 1 : 0;
         }
         if (user.supportPartnerWithElderlyParents &&
             potentialMatch.supportPartnerWithElderlyParents) {
@@ -178,20 +216,150 @@ const getSuggestedUsers = (user) => __awaiter(void 0, void 0, void 0, function* 
     };
 });
 const createMatch = (userId, suggestedUserId) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield user_model_1.User.findById(userId);
-    const suggestedUser = yield user_model_1.User.findById(suggestedUserId);
-    if (!user || !suggestedUser)
-        throw new Error('User not found');
-    const url = `https://matchmacking-platform.netlify.app`;
-    yield (0, user_constant_1.sendEmail)(`${user.email}`, 'New Match Request', `You have a new match request. View details at: ${url}/${userId} `);
-    yield (0, user_constant_1.sendEmail)(`${suggestedUser.email}`, 'New Match Request', `You have a new match request. View details at: ${url}/${suggestedUserId} `);
-    const data = {
-        userId,
-        suggestedUserId,
-        action: 'pending',
-    };
-    const result = yield match_model_1.Match.create(data);
-    return result;
+    try {
+        // Find users by IDs
+        const user = yield user_model_1.User.findById(userId);
+        const suggestedUser = yield user_model_1.User.findById(suggestedUserId);
+        // Check if both users exist
+        if (!user) {
+            throw new Error(`User with ID ${userId} not found`);
+        }
+        if (!suggestedUser) {
+            throw new Error(`Suggested user with ID ${suggestedUserId} not found`);
+        }
+        // Define the URL for the match request
+        // const url = 'https://matchmaking-platform.netlify.app/invitation'
+        const url = 'http://localhost:5173/invitation';
+        // Send email notifications
+        yield Promise.all([
+            (0, user_constant_1.sendEmail)(user.email, 'New Match Request', `You have a new match request. View details at: ${url}/${suggestedUserId}`),
+            (0, user_constant_1.sendEmail)(suggestedUser.email, 'New Match Request', `You have a new match request. View details at: ${url}/${userId}`),
+        ]);
+        // Create the match record
+        const data = {
+            userId,
+            userAction: 'no',
+            matchesUserId: suggestedUserId,
+            matchesAction: 'no',
+            action: 'pending',
+        };
+        const result = yield match_model_1.Match.create(data);
+        // Return the created match record
+        return result;
+    }
+    catch (error) {
+        // Log and rethrow errors for further handling
+        console.error('Error creating match:', error);
+        throw error;
+    }
+});
+const resendMatch = (userId, suggestedUserId) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Find users by IDs
+        const user = yield user_model_1.User.findById(userId);
+        const suggestedUser = yield user_model_1.User.findById(suggestedUserId);
+        // console.log('id', user)
+        // Check if both users exist
+        if (!user) {
+            throw new Error(`User with ID ${userId} not found`);
+        }
+        if (!suggestedUser) {
+            throw new Error(`Suggested user with ID ${suggestedUserId} not found`);
+        }
+        // Define the URL for the match request
+        // const url = 'https://matchmaking-platform.netlify.app/invitation'
+        const url = 'http://localhost:5173/invitation';
+        // Send email notifications
+        yield Promise.all([
+            (0, user_constant_1.sendEmail)(user.email, 'Again Match Request', `You have a again match request. View details at: ${url}/${suggestedUserId}`),
+            (0, user_constant_1.sendEmail)(suggestedUser.email, 'Again Match Request', `You have a again match request. View details at: ${url}/${userId}`),
+        ]);
+        // Create the match record
+        // Return the created match record
+        return;
+    }
+    catch (error) {
+        // Log and rethrow errors for further handling
+        console.error('Error creating match:', error);
+        throw error;
+    }
+});
+const UpdateMatch = (userId, suggestedUserId) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Find users by IDs
+        const user = yield match_model_1.Match.findOne({ userId });
+        const suggestedUser = yield match_model_1.Match.findOne({
+            matchesUserId: suggestedUserId,
+        });
+        // console.log('user and sug', user, suggestedUser);
+        // Prepare the data to be updated
+        let updateCriteria = {};
+        let updateData = {};
+        if (user) {
+            console.log('Updating user action');
+            updateCriteria = { userId };
+            updateData = { userAction: 'yes' };
+        }
+        else if (suggestedUser) {
+            console.log('Updating suggested user action');
+            updateCriteria = { matchesUserId: suggestedUserId };
+            updateData = { matchesAction: 'yes' };
+        }
+        else {
+            throw new Error('No matching record found for the provided IDs');
+        }
+        // Perform the initial update operation
+        const result = yield match_model_1.Match.findOneAndUpdate(updateCriteria, { $set: updateData }, { new: true } // Return the updated document
+        );
+        // console.log('Initial update', result);
+        if (result) {
+            // Check if both actions are set to 'yes'
+            if (result.userAction === 'yes' && result.matchesAction === 'yes') {
+                // Update to set action as 'accepted'
+                const finalUpdateData = { action: 'accepted' };
+                const finalResult = yield match_model_1.Match.findOneAndUpdate(updateCriteria, { $set: finalUpdateData }, { new: true } // Return the updated document
+                );
+                // console.log('Final update', finalResult);
+                // Return the final updated match record
+                return finalResult;
+            }
+        }
+        // Return the result of the initial update if no final update is needed
+        return result || undefined;
+    }
+    catch (error) {
+        // Log and rethrow errors for further handling
+        console.error('Error updating match:', error);
+        throw error;
+    }
+});
+const UpdateUnmatch = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Find the match by ID
+        const matchDetail = yield match_model_1.Match.findById(id).exec();
+        // Check if the match was found
+        if (!matchDetail) {
+            throw new Error('No matching record found for the provided ID');
+        }
+        // Prepare the update data
+        const updateData = {
+            userAction: 'no',
+            matchesAction: 'no',
+            action: 'pending',
+        };
+        // Perform the update operation
+        const result = yield match_model_1.Match.findByIdAndUpdate(id, { $set: updateData }, { new: true, runValidators: true } // Return the updated document and apply schema validators
+        ).exec();
+        // Log the result for debugging
+        console.log('Updated match:', result);
+        // Return the updated document or undefined if not found
+        return result || undefined;
+    }
+    catch (error) {
+        // Log the error and rethrow it
+        console.error('Error updating match:', error);
+        throw error;
+    }
 });
 const handleAccept = (userId, matchUserId, action) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield user_model_1.User.findById(userId);
@@ -210,8 +378,13 @@ const handleAccept = (userId, matchUserId, action) => __awaiter(void 0, void 0, 
     return result;
 });
 exports.MatchMakingService = {
+    getAllMatchs,
+    getAllMatchesWithUserDetails,
+    UpdateMatch,
     getSuggestedUsers,
     getUserDetails,
     createMatch,
+    resendMatch,
     handleAccept,
+    UpdateUnmatch,
 };

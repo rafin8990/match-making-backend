@@ -51,6 +51,7 @@ const getAllUsers = (filters, paginationOptions) => __awaiter(void 0, void 0, vo
         const { searchTerm } = filters, filtersData = __rest(filters, ["searchTerm"]);
         const { page, limit, skip, sortBy, sortOrder } = paginationHelper_1.paginationHelpers.calculatePagination(paginationOptions);
         const andConditions = [];
+        console.log('data', searchTerm);
         if (searchTerm) {
             andConditions.push({
                 $or: user_constant_1.UserSearchableFields.map(field => ({
@@ -103,6 +104,21 @@ const getSingleUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
         throw new ApiError_1.default(http_status_1.default.INTERNAL_SERVER_ERROR, 'Unable to retrieve user');
     }
 });
+const getUserByEmail = (email) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Find user by email
+        const user = yield user_model_1.User.findOne({ email }).lean(); // Use lean() for better performance
+        // console.log('User:', user);
+        if (!user) {
+            throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'User not found');
+        }
+        return user;
+    }
+    catch (error) {
+        console.error('Error retrieving user:', error);
+        throw new ApiError_1.default(http_status_1.default.INTERNAL_SERVER_ERROR, 'Unable to retrieve user');
+    }
+});
 const updateUser = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = yield user_model_1.User.findByIdAndUpdate(id, updateData, {
@@ -119,9 +135,17 @@ const updateUser = (id, updateData) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 const submitUserUpdate = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const user = yield user_model_1.User.findById(id);
     if (!user) {
         throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'User not found');
+    }
+    if (updateData.selectedImage) {
+        user.selectedImage = updateData.selectedImage;
+        if (user.images && user.images.length >= 5) {
+            user.images.shift();
+        }
+        (_a = user.images) === null || _a === void 0 ? void 0 : _a.push(updateData.selectedImage);
     }
     user.pendingUpdates = Object.assign(Object.assign({}, user.pendingUpdates), updateData);
     user.isUpdated = false;
@@ -168,13 +192,43 @@ const deleteUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
         throw new ApiError_1.default(http_status_1.default.INTERNAL_SERVER_ERROR, 'Unable to delete user');
     }
 });
+const updatePhoto = (id, imageUrl) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = yield user_model_1.User.findById(id);
+        if (!user) {
+            throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'User not found');
+        }
+        yield user.addImage(imageUrl);
+        return user;
+    }
+    catch (error) {
+        throw new ApiError_1.default(http_status_1.default.INTERNAL_SERVER_ERROR, 'Unable to update photo');
+    }
+});
+const toggleTwoFactorAuthentication = (id, enable) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = yield user_model_1.User.findById(id);
+        if (!user) {
+            throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'User not found');
+        }
+        user.is2Authenticate = enable;
+        yield user.save();
+        return user;
+    }
+    catch (error) {
+        throw new ApiError_1.default(http_status_1.default.INTERNAL_SERVER_ERROR, 'Unable to update two-factor authentication status');
+    }
+});
 exports.UserService = {
     createUser,
     getAllUsers,
     getSingleUser,
+    getUserByEmail,
     updateUser,
     submitUserUpdate,
     approveUserUpdate,
     declineUserUpdate,
     deleteUser,
+    updatePhoto,
+    toggleTwoFactorAuthentication
 };

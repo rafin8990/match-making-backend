@@ -53,7 +53,7 @@ const generateRandomPassword = () => {
     return password;
 };
 exports.generateRandomPassword = generateRandomPassword;
-const sendEmail = (to, subject, text) => __awaiter(void 0, void 0, void 0, function* () {
+const sendEmail = (to, subject, html) => __awaiter(void 0, void 0, void 0, function* () {
     const transporter = nodemailer_1.default.createTransport((0, nodemailer_smtp_transport_1.default)({
         service: 'Gmail',
         auth: {
@@ -65,7 +65,7 @@ const sendEmail = (to, subject, text) => __awaiter(void 0, void 0, void 0, funct
         from: config_1.default.emailFrom,
         to,
         subject,
-        text,
+        html,
     };
     yield transporter.sendMail(mailOptions);
 });

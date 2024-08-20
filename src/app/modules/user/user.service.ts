@@ -51,6 +51,8 @@ const getAllUsers = async (
     const { page, limit, skip, sortBy, sortOrder } =
       paginationHelpers.calculatePagination(paginationOptions)
     const andConditions = []
+
+    console.log('data', searchTerm)
     if (searchTerm) {
       andConditions.push({
         $or: UserSearchableFields.map(field => ({
@@ -113,6 +115,27 @@ const getSingleUser = async (id: string): Promise<IUser | null> => {
     )
   }
 }
+const getUserByEmail = async (email: string): Promise<IUser | null> => {
+  try {
+    // Find user by email
+    const user = await User.findOne({ email }).lean(); // Use lean() for better performance
+
+    // console.log('User:', user);
+
+    if (!user) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+    }
+
+    return user;
+  } catch (error) {
+    console.error('Error retrieving user:', error);
+    throw new ApiError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      'Unable to retrieve user'
+    );
+  }
+}
+
 
 const updateUser = async (
   id: string,
@@ -144,16 +167,14 @@ const submitUserUpdate = async (
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found')
   }
-  // console.log(updateData)
 
   if (updateData.selectedImage) {
-    user.selectedImage = updateData.selectedImage
+    user.selectedImage = updateData.selectedImage;
     if (user.images && user.images.length >= 5) {
-      user.images.shift()
+      user.images.shift();
     }
-    user.images?.push(updateData.selectedImage)
+    user.images?.push(updateData.selectedImage); 
   }
-  user.isFirstTime = false
   user.pendingUpdates = { ...user.pendingUpdates, ...updateData }
   user.isUpdated = false
   await user.save()
@@ -174,7 +195,7 @@ const approveUserUpdate = async (id: string): Promise<IUser | null> => {
     user.isUpdated = true
     await user.save()
   }
-  await user.save()
+  await user.save();
   return user
 }
 
@@ -216,16 +237,13 @@ const deleteUser = async (id: string): Promise<IUser | null> => {
   }
 }
 
-const updatePhoto = async (
-  id: string,
-  imageUrl: string
-): Promise<IUser | null> => {
+const updatePhoto=async(id:string,imageUrl:string):Promise<IUser| null>=>{
   try {
-    const user = await User.findById(id)
+    const user = await User.findById(id);
     if (!user) {
       throw new ApiError(httpStatus.NOT_FOUND, 'User not found')
     }
-    await user.addImage(imageUrl)
+    await user.addImage(imageUrl);
     return user
   } catch (error) {
     throw new ApiError(
@@ -235,35 +253,39 @@ const updatePhoto = async (
   }
 }
 
+
 const toggleTwoFactorAuthentication = async (
   id: string,
   enable: boolean
 ): Promise<IUser | null> => {
   try {
-    const user = await User.findById(id)
+    const user = await User.findById(id);
     if (!user) {
-      throw new ApiError(httpStatus.NOT_FOUND, 'User not found')
+      throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
     }
-    user.is2Authenticate = enable
-    await user.save()
-    return user
+    user.is2Authenticate = enable;
+    await user.save();
+    return user;
   } catch (error) {
     throw new ApiError(
       httpStatus.INTERNAL_SERVER_ERROR,
       'Unable to update two-factor authentication status'
-    )
+    );
   }
-}
+};
+
+
 
 export const UserService = {
   createUser,
   getAllUsers,
   getSingleUser,
+  getUserByEmail,
   updateUser,
   submitUserUpdate,
   approveUserUpdate,
   declineUserUpdate,
   deleteUser,
   updatePhoto,
-  toggleTwoFactorAuthentication,
+  toggleTwoFactorAuthentication
 }

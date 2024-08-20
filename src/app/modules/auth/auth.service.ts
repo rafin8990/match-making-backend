@@ -188,12 +188,14 @@ const changePassword = async (
 
 const sendOTP = async (email: string): Promise<IUser | null> => {
   const user = await User.findOne({ email })
+
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User Does not exist')
   }
 
   const otpCode = crypto.randomInt(1000, 9999).toString()
   const otpExpiration = new Date(Date.now() + 2 * 60 * 1000)
+  // console.log('data', otpCode, user)
   user.otpCode = otpCode
   user.otpExpiration = otpExpiration
   await user.save()
@@ -207,6 +209,7 @@ const verifyOtpCode = async (
   email: string,
   otpCode: string
 ): Promise<IUser | null> => {
+  console.log('data', email, otpCode)
   const user = await User.findOne({ email })
   const date = new Date()
   if (!user) {
@@ -228,13 +231,13 @@ const verifyOtpCode = async (
 const resetPassword = async (
   email: string,
   newPassword: string,
-  confirmPassword:string
+  confirmPassword: string
 ): Promise<IUser | null> => {
   const user = await User.findOne({ email }, { password: 1 })
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist')
   }
-  if(newPassword !== confirmPassword){
+  if (newPassword !== confirmPassword) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Password did not match')
   }
   const hashedPassword = await bcrypt.hash(
@@ -246,23 +249,23 @@ const resetPassword = async (
   return user
 }
 
-const verify2FA = async (
-  userData: JwtPayload | null,
-  verifyData: IVerifyData
-): Promise<IUser> => {
+const verify2FA = async (verifyData: IVerifyData): Promise<IUser> => {
   const { verificationCode } = verifyData
-  const email = userData?.email
+  const email = verifyData?.email
 
+  // console.log('data',verificationCode, email)
   if (!email) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Email not provided')
   }
 
   const user = await User.findOne({ email })
+
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist')
   }
 
-  const savedCode = user?.verificationCode
+  const savedCode = user?.otpCode
+  // console.log('data', savedCode, verificationCode)
   const checkVerificationCode = Number(savedCode) === Number(verificationCode)
 
   if (!checkVerificationCode) {
@@ -281,5 +284,5 @@ export const AuthService = {
   verify2FA,
   sendOTP,
   verifyOtpCode,
-  resetPassword
+  resetPassword,
 }

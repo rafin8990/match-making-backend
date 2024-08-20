@@ -18,6 +18,52 @@ const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const catchAsync_1 = __importDefault(require("../../../shared/catchAsync"));
 const sendResponse_1 = __importDefault(require("../../../shared/sendResponse"));
 const match_service_1 = require("./match.service");
+const getAllMatchs = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Retrieve all matches
+        const result = yield match_service_1.MatchMakingService.getAllMatchs();
+        // Send response
+        (0, sendResponse_1.default)(res, {
+            statusCode: http_status_1.default.OK,
+            message: 'Users match retrieved successfully',
+            success: true,
+            data: result,
+        });
+    }
+    catch (error) {
+        // Handle unexpected errors
+        console.error('Error retrieving matches:', error);
+        (0, sendResponse_1.default)(res, {
+            statusCode: http_status_1.default.INTERNAL_SERVER_ERROR,
+            message: 'An error occurred while retrieving matches',
+            success: false,
+            data: null,
+        });
+    }
+}));
+const getAllMatchesWithUserDetails = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Retrieve all matches
+        const result = yield match_service_1.MatchMakingService.getAllMatchesWithUserDetails();
+        // Send response
+        (0, sendResponse_1.default)(res, {
+            statusCode: http_status_1.default.OK,
+            message: 'Users match retrieved successfully',
+            success: true,
+            data: result,
+        });
+    }
+    catch (error) {
+        // Handle unexpected errors
+        console.error('Error retrieving matches:', error);
+        (0, sendResponse_1.default)(res, {
+            statusCode: http_status_1.default.INTERNAL_SERVER_ERROR,
+            message: 'An error occurred while retrieving matches',
+            success: false,
+            data: null,
+        });
+    }
+}));
 const getUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.params.id;
     const result = yield match_service_1.MatchMakingService.getUserDetails(userId);
@@ -45,10 +91,44 @@ const getSuggestions = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
 }));
 const createMatch = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { userId, suggestedUserId } = req.body;
+    // console.log('userId', userId, suggestedUserId)
     const result = yield match_service_1.MatchMakingService.createMatch(userId, suggestedUserId);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         message: 'Match request sent successfully',
+        success: true,
+        data: result,
+    });
+}));
+const resendMatch = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userId, suggestedUserId } = req.body;
+    // console.log('userId', userId, suggestedUserId)
+    const result = yield match_service_1.MatchMakingService.resendMatch(userId, suggestedUserId);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        message: 'Match request sent successfully',
+        success: true,
+        data: result,
+    });
+}));
+const UpdateMatch = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userId, suggestedUserId } = req.body;
+    // console.log('userId', userId, suggestedUserId)
+    const result = yield match_service_1.MatchMakingService.UpdateMatch(userId, suggestedUserId);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        message: 'Match request sent successfully',
+        success: true,
+        data: result,
+    });
+}));
+const UpdateUnmatch = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.body;
+    // console.log('userId', id)
+    const result = yield match_service_1.MatchMakingService.UpdateUnmatch(id);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        message: 'Unmatch request sent successfully',
         success: true,
         data: result,
     });
@@ -64,8 +144,13 @@ const handleAccept = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
     });
 }));
 exports.MatchMakingController = {
+    getAllMatchs,
+    getAllMatchesWithUserDetails,
+    UpdateMatch,
     getUser,
     getSuggestions,
     createMatch,
+    resendMatch,
     handleAccept,
+    UpdateUnmatch,
 };

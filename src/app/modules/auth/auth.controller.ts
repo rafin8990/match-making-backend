@@ -59,7 +59,7 @@ const refreshToken: RequestHandler = catchAsync(
 )
 
 const changePassword = catchAsync(async (req: Request, res: Response) => {
-  const passwordData = req.body
+  const { ...passwordData } = req.body
   const token = req.headers.authorization as string
   const decoded = jwt.verify(token, config.jwt_secret as string) as JwtPayload
   const user = (req.user = decoded)
@@ -74,10 +74,11 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
     data: result,
   })
 })
+
 const sendOTP = catchAsync(async (req: Request, res: Response) => {
   const {email }= req.body
 
-  
+ 
   const result = await AuthService.sendOTP(email)
 
   sendResponse(res, {
@@ -89,7 +90,7 @@ const sendOTP = catchAsync(async (req: Request, res: Response) => {
 })
 const verifyOtpCode = catchAsync(async (req: Request, res: Response) => {
   const { email, otpCode } = req.body;
-  
+
   const result = await AuthService.verifyOtpCode(email,otpCode)
 
   sendResponse(res, {
@@ -101,7 +102,7 @@ const verifyOtpCode = catchAsync(async (req: Request, res: Response) => {
 })
 const resetPassword = catchAsync(async (req: Request, res: Response) => {
   const { email,newPassword,confirmPassword } = req.body;
-  
+
   const result = await AuthService.resetPassword(email,newPassword,confirmPassword)
 
   sendResponse(res, {
@@ -113,13 +114,16 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
 })
 
 
-
 const verify2FA = catchAsync(async (req: Request, res: Response) => {
   const verifyData = req.body
-  const token = req.headers.authorization as string
-  const decoded = jwt.verify(token, config.jwt_secret as string) as JwtPayload
-  const user = (req.user = decoded)
-  const results = await AuthService.verify2FA(user, verifyData)
+
+  // const token = req.headers.authorization as string
+
+  // const decoded = jwt.verify(token, config.jwt_secret as string) as JwtPayload
+  // const user = (req.user = decoded)
+  // const email : any = verifyData.email
+
+  const results = await AuthService.verify2FA(verifyData)
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -128,6 +132,7 @@ const verify2FA = catchAsync(async (req: Request, res: Response) => {
     data: results,
   })
 })
+
 
 const signOutUser = catchAsync(async (req: Request, res: Response) => {
   res.clearCookie('refreshToken');
@@ -138,6 +143,50 @@ const signOutUser = catchAsync(async (req: Request, res: Response) => {
     message: 'User signed out successfully',
   });
 });
+
+// const forgetPassword = catchAsync(async (req: Request, res: Response) => {
+//   const { ...passwordData } = req.body
+//   // console.log(passwordData);
+//   const token = req.headers.authorization as string
+//   const decoded = jwt.verify(token, config.jwt_secret as string) as JwtPayload
+//   const user = (req.user = decoded)
+//   //    console.log(user)
+
+//   const result = await AuthService.forgetPassword(user, passwordData)
+
+//   sendResponse(res, {
+//     statusCode: httpStatus.OK,
+//     success: true,
+//     message: 'Password Changed Successfully',
+//     data: result,
+//   })
+// })
+
+// const verify2FA = async (req: Request, res: Response) => {
+//   const { ...verifyData } = req.body
+  
+//   const token = req.headers.authorization as string
+//   const decoded = jwt.verify(token, config.jwt_secret as string) as JwtPayload
+//   const user = (req.user = decoded)
+//   const tokens = await AuthService.verify2FA(user,verifyData)
+  
+//   sendResponse(res, {
+//     statusCode: httpStatus.OK,
+//     success: true,
+//     message: 'Pin Matched Successfully',
+//     data: tokens,
+//   })
+// }
+
+// const signOutUser = catchAsync(async (req: Request, res: Response) => {
+//   res.clearCookie('refreshToken'); 
+
+//   sendResponse(res, {
+//     statusCode: httpStatus.OK,
+//     success: true,
+//     message: 'User signed out successfully',
+//   });
+// });
 
 export const AuthController = {
   loginUser,
