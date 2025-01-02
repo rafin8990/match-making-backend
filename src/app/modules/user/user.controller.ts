@@ -39,7 +39,6 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 
 const getSingleUser = catchAsync(async (req: Request, res: Response) => {
   const userId = req.params.id
-  // console.log('userId', userId)
   const result = await UserService.getSingleUser(userId)
 
   sendResponse<IUser>(res, {
@@ -49,9 +48,9 @@ const getSingleUser = catchAsync(async (req: Request, res: Response) => {
     data: result,
   })
 })
+
 const getUserByEmail = catchAsync(async (req: Request, res: Response) => {
   const userEmail = req.params.email
-  // console.log('userId', userEmail)
   const result = await UserService.getUserByEmail(userEmail)
 
   sendResponse<IUser>(res, {
@@ -77,7 +76,7 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
 
 const submitUserUpdate = catchAsync(async (req: Request, res: Response) => {
   const userId = req.params.id
-  const updateData: Partial<IUser> = req.body
+  const updateData = req.body
 
   const result = await UserService.submitUserUpdate(userId, updateData)
 
@@ -91,6 +90,7 @@ const submitUserUpdate = catchAsync(async (req: Request, res: Response) => {
 
 const approveUserUpdate = catchAsync(async (req: Request, res: Response) => {
   const userId = req.params.id
+  console.log(userId);
   const result = await UserService.approveUserUpdate(userId)
   sendResponse<IUser>(res, {
     statusCode: httpStatus.OK,
@@ -101,20 +101,15 @@ const approveUserUpdate = catchAsync(async (req: Request, res: Response) => {
 })
 
 const declineUserUpdate = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.params.id;
-  const { reason } = req.body;
-
-  const result = await UserService.declineUserUpdate(userId, reason);
-
+  const userId = req.params.id
+  const result = await UserService.declineUserUpdate(userId)
   sendResponse<IUser>(res, {
     statusCode: httpStatus.OK,
     message: 'User update request declined.',
     success: true,
     data: result,
-  });
-});
-
-
+  })
+})
 
 const deleteUser = catchAsync(async (req: Request, res: Response) => {
   const userId = req.params.id
@@ -128,10 +123,34 @@ const deleteUser = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
+const selectedphoto = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id
+  const  {selectedImage}  = req.body; 
+  // console.log(selectedImage);
+  const result = await UserService.selectedPhoto(id, selectedImage)
+
+  sendResponse<IUser>(res, {
+    statusCode: httpStatus.OK,
+    message: 'User photo selected successfully',
+    success: true,
+    data: result,
+  })
+})
+const removeSelectedphoto = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id
+  const result = await UserService.removeSelectedPhoto(id)
+  sendResponse<IUser>(res, {
+    statusCode: httpStatus.OK,
+    message: 'User photo selected successfully',
+    success: true,
+    data: result,
+  })
+})
 const updatephoto = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id
-  const imageUrl = req.body
-  const result = await UserService.updatePhoto(id, imageUrl)
+  const  {selectedImage}  = req.body; 
+  // console.log(selectedImage);
+  const result = await UserService.updatePhoto(id, selectedImage)
 
   sendResponse<IUser>(res, {
     statusCode: httpStatus.OK,
@@ -140,18 +159,89 @@ const updatephoto = catchAsync(async (req: Request, res: Response) => {
     data: result,
   })
 })
+const updateAdminphoto = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id
+  const  {selectedImage}  = req.body; 
+  // console.log(selectedImage);
+  const result = await UserService.updateAdminPhoto(id, selectedImage)
 
-const toggleTwoFactor = catchAsync(async (req: Request, res: Response) => {
-  const id = req.params.id;
-  const { enable } = req.body;
-  const result = await UserService.toggleTwoFactorAuthentication(id, enable);
   sendResponse<IUser>(res, {
     statusCode: httpStatus.OK,
-    message: `Two-factor authentication ${enable ? 'enabled' : 'disabled'} successfully`,
+    message: 'User photo updated successfully',
     success: true,
     data: result,
-  });
-});
+  })
+})
+const deletephoto = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id
+  console.log(req.body)
+  const {imageURL} = req.body
+  const result = await UserService.deletePhoto(id, imageURL)
+
+  sendResponse<IUser>(res, {
+    statusCode: httpStatus.OK,
+    message: 'User photo Deleted successfully',
+    success: true,
+    data: result,
+  })
+})
+
+const toggleTwoFactor = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id
+  const { enable } = req.body
+  const result = await UserService.toggleTwoFactorAuthentication(id, enable)
+  sendResponse<IUser>(res, {
+    statusCode: httpStatus.OK,
+    message: `Two-factor authentication ${
+      enable ? 'enabled' : 'disabled'
+    } successfully`,
+    success: true,
+    data: result,
+  })
+})
+
+const makeAdmin = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id
+  const result = await UserService.makeAdmin(id)
+  sendResponse<IUser>(res, {
+    statusCode: httpStatus.OK,
+    message: `Admin Added successfully`,
+    success: true,
+    data: result,
+  })
+})
+const removeAdmin = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id
+  const result = await UserService.removeAdmin(id)
+  sendResponse<IUser>(res, {
+    statusCode: httpStatus.OK,
+    message: `Admin Removed successfully`,
+    success: true,
+    data: result,
+  })
+})
+
+const makeDisabled = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id
+  const result = await UserService.makeDisabled(id)
+  sendResponse<IUser>(res, {
+    statusCode: httpStatus.OK,
+    message: `User Disabled successfully`,
+    success: true,
+    data: result,
+  })
+})
+const removeDisabled = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id
+  const result = await UserService.removeDisabled(id)
+  sendResponse<IUser>(res, {
+    statusCode: httpStatus.OK,
+    message: `User Enabled successfully`,
+    success: true,
+    data: result,
+  })
+})
+
 export const userController = {
   createUser,
   getAllUsers,
@@ -163,5 +253,13 @@ export const userController = {
   declineUserUpdate,
   deleteUser,
   updatephoto,
-  toggleTwoFactor
+  deletephoto,
+  toggleTwoFactor,
+  makeAdmin,
+  removeAdmin,
+  makeDisabled,
+  removeDisabled,
+  selectedphoto,
+  removeSelectedphoto,
+  updateAdminphoto
 }

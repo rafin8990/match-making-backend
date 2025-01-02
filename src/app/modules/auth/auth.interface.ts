@@ -4,7 +4,10 @@ export type ILoginUser = {
 }
 
 export type ILoginUserResponse = {
-  accessToken: string
+  isTwoAuthenticate?:boolean;
+  email?:string;
+  message?:string
+  accessToken?: string
   refreshToken?: string
   needsPasswordChange?: boolean
 }

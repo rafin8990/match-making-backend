@@ -1,9 +1,13 @@
-import { Model } from "mongoose";
+import { Model } from 'mongoose'
 
-export type IMessage={
-title:string
-content:string;
-email:string
+export type IMessage = {
+  title: string
+  content: string
+  email: string
+  userId?: string
+  firstName?: string
+  lastName?: string
+  seen?: string
 }
 
 export type messageModel = Model<IMessage, Record<string, unknown>>

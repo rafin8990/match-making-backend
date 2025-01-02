@@ -6,10 +6,11 @@ import { JwtPayload, Secret } from 'jsonwebtoken'
 import config from '../../../config'
 import ApiError from '../../../errors/ApiError'
 import { jwtHelpers } from '../../../helper/jwtHelper'
-import { sendEmail } from '../user/user.constant'
+import { sendEmail, sendOTPEmail } from '../user/user.constant'
 import { IUser } from '../user/user.interface'
 import { User } from '../user/user.model'
-import { sendVerificationCode } from './auth.constant'
+// import Image from '../../../../public/logo1.png'
+// import { sendVerificationCode } from './auth.constant'
 import {
   IChangePassword,
   ILoginUser,
@@ -18,8 +19,11 @@ import {
   IVerifyData,
 } from './auth.interface'
 
+
 const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
-  const { email, password } = payload
+  const { email, password } = payload;
+
+  // Find the user in the database
   const user = await User.findOne(
     { email: email },
     {
@@ -31,29 +35,59 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
       isApproved: 1,
       verificationCode: 1,
       isFirstTime: 1,
+      isDisabled: 1,
     }
-  )
+  );
 
+  // Handle errors for missing user or password mismatch
   if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist')
+    throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist');
   }
 
-  const givenPassword = await bcrypt.compare(password, user?.password as string)
+  const givenPassword = await bcrypt.compare(password, user?.password as string);
 
   if (!givenPassword) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Password did not match')
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Password did not match');
   }
 
-  if (user.is2Authenticate === true) {
-    const verificationCode = Math.floor(1000 + Math.random() * 9000)
-    const subject = 'Your Verification Code'
-    const text = `Your verification code is ${verificationCode}. Please enter this code to  your login your profile.`
-    user.verificationCode = verificationCode
-    await user.save()
-    await sendVerificationCode(email, subject, text)
+  if (user.isDisabled) {
+    throw new ApiError(httpStatus.NOT_ACCEPTABLE, 'Your ID is disabled.');
   }
 
-  // Create access and refresh tokens
+  // If two-factor authentication is required
+  if (user.is2Authenticate) {
+    // Immediate response
+    const response = {
+      isTwoAuthenticate: true,
+      email: user.email,
+      message: 'An authentication code will be sent to your email shortly.',
+    };
+
+    // Async OTP generation and email sending
+    setImmediate(async () => {
+      try {
+        const otpCode = Math.floor(1000 + Math.random() * 9000);
+        const otpExpiration = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+
+        user.otpCode = otpCode;
+        user.otpExpiration = otpExpiration;
+        await user.save();
+        await sendOTPEmail(
+          email,
+          'Your Authentication Code',
+          otpCode
+        );
+        console.log('OTP email sent successfully.');
+      } catch (error) {
+        console.error('Error sending OTP email:', error);
+      }
+    });
+    // io.emit('notification', { message: `New Login ${user.email}` })
+    return response; // Send response before OTP and email logic completes
+  }
+
+  // If no two-factor authentication is required, proceed with generating tokens
   const accessToken = jwtHelpers.createToken(
     {
       email: user.email,
@@ -64,13 +98,12 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
       isApproved: user.isApproved,
       is2Authenticate: user.is2Authenticate,
       verificationCode: user.verificationCode,
-      password: password,
       isFirstTime: user.isFirstTime,
       needsPasswordChange: user.needsPasswordChange,
     },
     config.jwt_secret as string,
     config.jwt_expires_in as string
-  )
+  );
 
   const refreshToken = jwtHelpers.createToken(
     {
@@ -82,20 +115,20 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
       isApproved: user.isApproved,
       is2Authenticate: user.is2Authenticate,
       verificationCode: user.verificationCode,
-      password: password,
-      isFirstTime: user?.isFirstTime,
+      isFirstTime: user.isFirstTime,
       needsPasswordChange: user.needsPasswordChange,
     },
     config.jwt_refresh_secret as string,
     config.jwt_refresh_expires_in as string
-  )
+  );
 
   return {
     accessToken,
     refreshToken,
     needsPasswordChange: user.needsPasswordChange,
-  }
-}
+  };
+};
+
 
 const refreshToken = async (token: string): Promise<IRefreshTokenResponse> => {
   const user = new User()
@@ -196,10 +229,9 @@ const sendOTP = async (email: string): Promise<IUser | null> => {
   const otpCode = crypto.randomInt(1000, 9999).toString()
   const otpExpiration = new Date(Date.now() + 2 * 60 * 1000)
   // console.log('data', otpCode, user)
-  user.otpCode = otpCode
+  user.otpCode = Number(otpCode)
   user.otpExpiration = otpExpiration
   await user.save()
-
   const message = `Your OTP Verification code is ${otpCode}. This code is expired in two minutes.`
   sendEmail(email, 'You Received an OTP Code', message)
   return user
@@ -207,9 +239,9 @@ const sendOTP = async (email: string): Promise<IUser | null> => {
 
 const verifyOtpCode = async (
   email: string,
-  otpCode: string
+  otpCode: number
 ): Promise<IUser | null> => {
-  console.log('data', email, otpCode)
+  // console.log('data', email, otpCode)
   const user = await User.findOne({ email })
   const date = new Date()
   if (!user) {
@@ -249,34 +281,124 @@ const resetPassword = async (
   return user
 }
 
-const verify2FA = async (verifyData: IVerifyData): Promise<IUser> => {
-  const { verificationCode } = verifyData
-  const email = verifyData?.email
+// const verify2FA = async (verifyData: IVerifyData): Promise<IUser> => {
+//   const { verificationCode } = verifyData
+//   const email = verifyData?.email
+//   console.log(email)
 
-  // console.log('data',verificationCode, email)
+//   // console.log('data',verificationCode, email)
+//   if (!email) {
+//     throw new ApiError(httpStatus.UNAUTHORIZED, 'Email not provided')
+//   }
+
+//   const user = await User.findOne({ email })
+
+//   if (!user) {
+//     throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist')
+//   }
+
+//   const savedCode = user?.otpCode
+//   // console.log('data', savedCode, verificationCode)
+//   const checkVerificationCode = Number(savedCode) === Number(verificationCode)
+
+//   if (!checkVerificationCode) {
+//     throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid verification code')
+//   }
+
+//   user.otpCode = undefined
+//   user.verificationCode = null
+//   await user.save()
+
+//   return user
+// }
+
+
+
+const verify2FA = async (
+  verifyData: IVerifyData
+): Promise<ILoginUserResponse> => {
+  const { email, verificationCode } = verifyData
+
   if (!email) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Email not provided')
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Email is required')
+  }
+
+  if (!verificationCode) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Verification code is required')
   }
 
   const user = await User.findOne({ email })
 
   if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist')
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found')
   }
 
-  const savedCode = user?.otpCode
-  // console.log('data', savedCode, verificationCode)
-  const checkVerificationCode = Number(savedCode) === Number(verificationCode)
+  if (!user.otpCode || !user.otpExpiration) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'No active OTP found for this user'
+    )
+  }
 
-  if (!checkVerificationCode) {
+  if (user.otpExpiration < new Date()) {
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      'OTP has expired. Please request a new one.'
+    )
+  }
+
+  const isCodeValid = Number(user.otpCode) === Number(verificationCode)
+
+  if (!isCodeValid) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid verification code')
   }
 
-  user.verificationCode = null
+  user.otpCode = undefined
+  user.otpExpiration = undefined
   await user.save()
 
-  return user
+  // Create access and refresh tokens
+  const accessToken = jwtHelpers.createToken(
+    {
+      email: user.email,
+      role: user.role,
+      id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      isApproved: user.isApproved,
+      is2Authenticate: user.is2Authenticate,
+      verificationCode: user.verificationCode,
+      isFirstTime: user.isFirstTime,
+      needsPasswordChange: user.needsPasswordChange,
+    },
+    config.jwt_secret as string,
+    config.jwt_expires_in as string
+  )
+
+  const refreshToken = jwtHelpers.createToken(
+    {
+      email: user.email,
+      role: user.role,
+      id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      isApproved: user.isApproved,
+      is2Authenticate: user.is2Authenticate,
+      verificationCode: user.verificationCode,
+      isFirstTime: user?.isFirstTime,
+      needsPasswordChange: user.needsPasswordChange,
+    },
+    config.jwt_refresh_secret as string,
+    config.jwt_refresh_expires_in as string
+  )
+
+  return {
+    accessToken,
+    refreshToken,
+    needsPasswordChange: user.needsPasswordChange,
+  }
 }
+
 export const AuthService = {
   loginUser,
   refreshToken,

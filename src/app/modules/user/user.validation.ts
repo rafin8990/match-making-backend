@@ -5,6 +5,20 @@ const createUserZodSchema = z.object({
     email: z.string({
       required_error: 'Email is required',
     }),
+    firstName: z.string({
+      required_error: 'First Name is required',
+    }),
+    lastName: z.string({
+      required_error: 'Last Name is required',
+    }),
+    referredBy: z.string({
+      required_error: 'Referred by is required',
+    }),
+    address: z.object({
+      city: z.string({
+        required_error: 'City is required',
+      }),
+    }),
     needsPasswordChange: z.boolean().optional(),
     passwordChangedAt: z.date().optional(),
     isVerified: z.boolean().optional(),
@@ -34,7 +48,12 @@ const UpdateUserZodSchema = z.object({
     phoneNumber: z.string().optional(),
     age: z.number().optional(),
     sex: z.enum(['male', 'female', 'other']).optional(),
-    height: z.string().optional(),
+    height: z
+      .object({
+        heightfeet: z.number().optional(),
+        heightinch: z.number().optional(),
+      })
+      .optional(),
     dateOfBirth: z.string().optional(),
     birth_country: z.string().optional(),
     birthPlace: z.string().optional(),
@@ -61,7 +80,7 @@ const UpdateUserZodSchema = z.object({
     reloacte: z.enum(['yes', 'no']).optional(),
     supportPartnerWithElderlyParents: z.enum(['yes', 'no']).optional(),
     investLongTermRelationship: z.enum(['yes', 'no']).optional(),
-    countriesVisited: z.number().optional(),
+    countriesVisited: z.string().optional(),
     immigratedYear: z.string().optional(),
     image: z.string().optional(),
     verificationCode: z.number().optional(),

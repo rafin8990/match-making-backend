@@ -4,6 +4,7 @@ import ApiError from '../../../errors/ApiError'
 import { paginationHelpers } from '../../../helper/paginationHelper'
 import { IGenericResponse } from '../../../interfaces/common'
 import { IPaginationOptions } from '../../../interfaces/pagination'
+import { Notification } from '../notification/notification.model'
 import { sendEmail } from '../user/user.constant'
 import { IMessageFilter, MessageSearchableFields } from './message.constant'
 import { IMessage } from './message.interface'
@@ -26,6 +27,27 @@ const createMessage = async (messageData: IMessage): Promise<IMessage> => {
     'You received an message from Admin',
     message
   )
+
+
+  const result = await Message.create(messageData)
+  return result
+}
+const createInviteMessage = async (
+  messageData: IMessage
+): Promise<IMessage> => {
+
+  const notificationData = {
+    userId: messageData.userId,
+    type: 'request',
+    message: `<b>${messageData?.lastName} ${messageData?.lastName}</b> Send a new message`,
+    section: 'match',
+    priority: 'medium',
+    relatedEntityId: 'link',
+    status: 'unread',
+  }
+
+  // Create the notification record
+  await Notification.create(notificationData)
   const result = await Message.create(messageData)
   return result
 }
@@ -141,6 +163,7 @@ const deleteMessage = async (id: string): Promise<IMessage | null> => {
 
 export const MessageService = {
   createMessage,
+  createInviteMessage,
   getAllMessage,
   getSingleMessage,
   updateMessage,

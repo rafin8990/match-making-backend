@@ -1,5 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Model } from 'mongoose'
+export type QuestionType={
+  question:string
+  answer: string
+  type:string
+}
 export type IUser = {
+  _id: any
   email: string
   role: 'user' | 'admin'
   password: string
@@ -10,17 +17,22 @@ export type IUser = {
   isApproved?: true | false
   is2Authenticate?: true | false
   isFirstTime?: true | false
+  isDisabled?: true | false
   firstName:string,
   lastName:string,
   address?: {
     city?: string
     state?: string
+    zip:number
     country?: string
   }
   phoneNumber?: string
   age?: number
   sex?: string
-  height?: string
+  height: {
+    heightfeet: number,
+    heightinch: number,
+  },
   dateOfBirth?: string
   birth_country?:string
   birthPlace?: string
@@ -45,13 +57,13 @@ export type IUser = {
   relocate?: string
   supportPartnerWithElderlyParents?: string
   investLongTermRelationship?: string
-  countriesVisited?: number
+  countriesVisited?: string
   immigratedYear?: string
   selectedImage?: string
   images?:string[]
+  pendingImages?:string[]
   verificationCode?: number | null
   pendingUpdates?: Partial<IUser>
-  updateStatusMessage?: string
   preferences?: {
     looks?: number
     religion?: number
@@ -60,9 +72,13 @@ export type IUser = {
     ageRange?: [number, number];
     wantChildren?: number
   },
-  matches?:string[]
-  otpCode ?:string,
-  otpExpiration?:Date
+  matches?:string[];
+  otpCode ?:number;
+  otpExpiration?:Date;
+  questions?:QuestionType[];
+  referredBy?:string
+  maritual_status?:string
+
 }
 
 export type IUserMethod = {

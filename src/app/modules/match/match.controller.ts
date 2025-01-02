@@ -10,7 +10,7 @@ import { MatchMakingService } from './match.service'
 const getAllMatchs = catchAsync(async (req: Request, res: Response) => {
   try {
     // Retrieve all matches
-    const result : any = await MatchMakingService.getAllMatchs();
+    const result: any = await MatchMakingService.getAllMatchs();
 
     // Send response
     sendResponse<IUserMatch>(res, {
@@ -33,7 +33,7 @@ const getAllMatchs = catchAsync(async (req: Request, res: Response) => {
 const getAllMatchesWithUserDetails = catchAsync(async (req: Request, res: Response) => {
   try {
     // Retrieve all matches
-    const result : any = await MatchMakingService.getAllMatchesWithUserDetails();
+    const result: any = await MatchMakingService.getAllMatchesWithUserDetails();
 
     // Send response
     sendResponse<IUserMatch>(res, {
@@ -54,7 +54,7 @@ const getAllMatchesWithUserDetails = catchAsync(async (req: Request, res: Respon
   }
 });
 
- 
+
 
 
 const getUser = catchAsync(async (req: Request, res: Response) => {
@@ -106,6 +106,7 @@ const resendMatch = catchAsync(async (req: Request, res: Response) => {
     data: result,
   })
 })
+
 const UpdateMatch = catchAsync(async (req: Request, res: Response) => {
   const { userId, suggestedUserId } = req.body
   // console.log('userId', userId, suggestedUserId)
@@ -117,10 +118,22 @@ const UpdateMatch = catchAsync(async (req: Request, res: Response) => {
     data: result,
   })
 })
-const UpdateUnmatch = catchAsync(async (req: Request, res: Response) => {
+
+const CheckMatch = catchAsync(async (req: Request, res: Response) => {
+  const { userId, suggestedUserId } = req.body
+  // console.log('check userId', userId, suggestedUserId)
+  const result = await MatchMakingService.CheckMatch(userId, suggestedUserId)
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Check Match request sent successfully',
+    success: true,
+    data: result,
+  })
+})
+const DeleteUnmatch = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.body
   // console.log('userId', id)
-  const result = await MatchMakingService.UpdateUnmatch(id)
+  const result = await MatchMakingService.DeleteUnmatch(id)
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message: 'Unmatch request sent successfully',
@@ -131,6 +144,7 @@ const UpdateUnmatch = catchAsync(async (req: Request, res: Response) => {
 
 const handleAccept = catchAsync(async (req: Request, res: Response) => {
   const { userId, matchUserId, action } = req.body
+  console.log(req.body)
   const result = await MatchMakingService.handleAccept(
     userId,
     matchUserId,
@@ -146,11 +160,12 @@ const handleAccept = catchAsync(async (req: Request, res: Response) => {
 export const MatchMakingController = {
   getAllMatchs,
   getAllMatchesWithUserDetails,
-  UpdateMatch,
   getUser,
   getSuggestions,
   createMatch,
   resendMatch,
+  UpdateMatch,
+  CheckMatch,
   handleAccept,
-  UpdateUnmatch,
+  DeleteUnmatch,
 }

@@ -1,7 +1,6 @@
 import { Schema, model } from 'mongoose'
 import { IMessage, messageModel } from './message.interface'
 
-
 const messageSchema = new Schema<IMessage, Record<string, never>, IMessage>(
   {
     email: {
@@ -16,6 +15,18 @@ const messageSchema = new Schema<IMessage, Record<string, never>, IMessage>(
       type: String,
       required: true,
     },
+    userId: {
+      type: String,
+    },
+    firstName: {
+      type: String,
+    },
+    lastName: {
+      type: String,
+    },
+    seen: {
+      type: String,
+    },
   },
   {
     timestamps: true,
@@ -24,7 +35,5 @@ const messageSchema = new Schema<IMessage, Record<string, never>, IMessage>(
     },
   }
 )
-
-
 
 export const Message = model<IMessage, messageModel>('Message', messageSchema)

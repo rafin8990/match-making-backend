@@ -9,6 +9,7 @@ import { AuthService } from './auth.service'
 
 const loginUser = catchAsync(async (req: Request, res: Response) => {
   const { ...loginData } = req.body
+  console.log(loginData)
   const result = await AuthService.loginUser(loginData)
 
   const { refreshToken, ...others } = result
@@ -76,9 +77,8 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
 })
 
 const sendOTP = catchAsync(async (req: Request, res: Response) => {
-  const {email }= req.body
+  const { email } = req.body
 
- 
   const result = await AuthService.sendOTP(email)
 
   sendResponse(res, {
@@ -89,9 +89,9 @@ const sendOTP = catchAsync(async (req: Request, res: Response) => {
   })
 })
 const verifyOtpCode = catchAsync(async (req: Request, res: Response) => {
-  const { email, otpCode } = req.body;
+  const { email, otpCode } = req.body
 
-  const result = await AuthService.verifyOtpCode(email,otpCode)
+  const result = await AuthService.verifyOtpCode(email, otpCode)
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -101,9 +101,13 @@ const verifyOtpCode = catchAsync(async (req: Request, res: Response) => {
   })
 })
 const resetPassword = catchAsync(async (req: Request, res: Response) => {
-  const { email,newPassword,confirmPassword } = req.body;
+  const { email, newPassword, confirmPassword } = req.body
 
-  const result = await AuthService.resetPassword(email,newPassword,confirmPassword)
+  const result = await AuthService.resetPassword(
+    email,
+    newPassword,
+    confirmPassword
+  )
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -113,36 +117,43 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
-
 const verify2FA = catchAsync(async (req: Request, res: Response) => {
   const verifyData = req.body
-
-  // const token = req.headers.authorization as string
-
-  // const decoded = jwt.verify(token, config.jwt_secret as string) as JwtPayload
-  // const user = (req.user = decoded)
-  // const email : any = verifyData.email
-
+console.log(verifyData)
   const results = await AuthService.verify2FA(verifyData)
+
+  const { refreshToken, ...others } = results
+
+
+  const cookieOption = {
+    secure: config.env === 'production' ? true : false,
+    httpOnly: true,
+  }
+
+  res.cookie('refreshToken', refreshToken, cookieOption)
+
+  // delete refresh token
+  if ('refreshToken' in results) {
+    delete results.refreshToken
+  }
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Pin Matched Successfully',
-    data: results,
+    data: others,
   })
 })
 
-
 const signOutUser = catchAsync(async (req: Request, res: Response) => {
-  res.clearCookie('refreshToken');
+  res.clearCookie('refreshToken')
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'User signed out successfully',
-  });
-});
+  })
+})
 
 // const forgetPassword = catchAsync(async (req: Request, res: Response) => {
 //   const { ...passwordData } = req.body
@@ -164,12 +175,12 @@ const signOutUser = catchAsync(async (req: Request, res: Response) => {
 
 // const verify2FA = async (req: Request, res: Response) => {
 //   const { ...verifyData } = req.body
-  
+
 //   const token = req.headers.authorization as string
 //   const decoded = jwt.verify(token, config.jwt_secret as string) as JwtPayload
 //   const user = (req.user = decoded)
 //   const tokens = await AuthService.verify2FA(user,verifyData)
-  
+
 //   sendResponse(res, {
 //     statusCode: httpStatus.OK,
 //     success: true,
@@ -179,7 +190,7 @@ const signOutUser = catchAsync(async (req: Request, res: Response) => {
 // }
 
 // const signOutUser = catchAsync(async (req: Request, res: Response) => {
-//   res.clearCookie('refreshToken'); 
+//   res.clearCookie('refreshToken');
 
 //   sendResponse(res, {
 //     statusCode: httpStatus.OK,
@@ -196,5 +207,5 @@ export const AuthController = {
   signOutUser,
   sendOTP,
   verifyOtpCode,
-  resetPassword
+  resetPassword,
 }

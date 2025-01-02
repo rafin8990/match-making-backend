@@ -9,6 +9,7 @@ import { IQuestion } from "./question.interface";
 import { Question } from "./question.model";
 
 const createQuestion = async (question: IQuestion): Promise<IQuestion> => {
+  // console.log("qu", question)
   const result = await Question.create(question);
   return result;
 };
@@ -19,7 +20,7 @@ const getAllQuestions = async (
 ): Promise<IGenericResponse<IQuestion[]>> => {
   try {
     const { searchTerm, ...filtersData } = filters;
-    const { page, limit, skip, sortBy, sortOrder } =
+    const { page, limit, skip, sortBy } =
       paginationHelpers.calculatePagination(paginationOptions);
 
     const andConditions = [];
@@ -44,8 +45,8 @@ const getAllQuestions = async (
 
     const sortConditions: { [key: string]: SortOrder } = {};
 
-    if (sortBy && sortOrder) {
-      sortConditions[sortBy] = sortOrder;
+    if (sortBy && 'asc') {
+      sortConditions[sortBy] = 'asc';
     }
     const whereConditions =
       andConditions.length > 0 ? { $and: andConditions } : {};

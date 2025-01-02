@@ -10,6 +10,7 @@ import { QuestionService } from "./question.service";
 
 const createQuestion = catchAsync(async (req: Request, res: Response) => {
   const question = req.body;
+  
   const result = await QuestionService.createQuestion(question);
   sendResponse(res, {
     statusCode: httpStatus.OK,

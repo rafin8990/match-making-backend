@@ -36,7 +36,7 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
     },
     is2Authenticate: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     isApproved: {
       type: Boolean,
@@ -45,6 +45,10 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
     isFirstTime: {
       type: Boolean,
       default: true,
+    },
+    isDisabled: {
+      type: Boolean,
+      default: false,
     },
     firstName: {
       type: String,
@@ -62,6 +66,9 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
       country: {
         type: String,
       },
+      zip: {
+        type: Number,
+      },
     },
     phoneNumber: {
       type: String,
@@ -73,7 +80,8 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
       type: String,
     },
     height: {
-      type: String,
+      heightfeet: { type: Number, default: null },
+      heightinch: { type: Number, default: null },
     },
     dateOfBirth: {
       type: String,
@@ -86,7 +94,6 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
     },
     education: {
       type: String,
-
     },
     educationDetails: {
       type: String,
@@ -115,6 +122,9 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
     hobbies: {
       type: String,
     },
+    maritual_status: {
+      type: String,
+    },
     comfortableLongDistance: {
       type: String,
     },
@@ -137,22 +147,24 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
     },
     relocate: {
       type: String,
- 
     },
     supportPartnerWithElderlyParents: {
       type: String,
-
     },
     investLongTermRelationship: {
       type: String,
     },
     countriesVisited: {
-      type: Number,
+      type: String,
     },
     immigratedYear: {
       type: String,
     },
     images: {
+      type: [String],
+      default: [],
+    },
+    pendingImages: {
       type: [String],
       default: [],
     },
@@ -166,9 +178,8 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
       type: Schema.Types.Mixed,
       default: [],
     },
-    updateStatusMessage: {
+    referredBy:{
       type: String,
-      default: '',
     },
     preferences: {
       looks: {
@@ -191,8 +202,11 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethod>(
       },
     },
     matches: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-    otpCode: { type: String },
+    otpCode: { type: Number },
     otpExpiration: { type: Date },
+    questions: {
+      type: [Object],
+    },
   },
   {
     timestamps: true,

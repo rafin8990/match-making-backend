@@ -1,44 +1,58 @@
-import { Server } from 'http'
-import mongoose from 'mongoose'
-import app from './app'
-import config from './config/index'
+import { Server } from 'http';
+import mongoose from 'mongoose';
+import app from './app';
+import config from './config/index';
+import { socket_server } from './socket/socket.server';
 
 process.on('uncaughtException', error => {
-  console.log(error)
-  process.exit(1)
-})
+  console.error('Uncaught Exception:', error);
+  process.exit(1);
+});
 
-let server: Server
+let server: Server;
+export let io: any;
 
 async function boostrap() {
   try {
-    await mongoose.connect(config.database_url as string)
-    console.log(`🛢   Database is connected successfully`)
+    await mongoose.connect(config.database_url as string);
+    console.log(`🛢 Database is connected successfully`);
+    server = app.listen(config.port, () => {
+      console.log(`🚀 Application is listening on port ${config.port}`);
+    });
 
-    app.listen(5000, () => {
-      console.log(`Application  listening on port ${5000}`)
-    })
+    io = require('socket.io')(server, {
+      cors: {
+        origin: '*',
+        methods: ['GET', 'POST'],
+      },
+    });
+
+    socket_server();
   } catch (err) {
-    console.log('Failed to connect database', err)
+    console.error('Failed to connect to the database:', err);
+    process.exit(1); 
   }
 }
 
 process.on('unhandledRejection', error => {
+  console.error('Unhandled Rejection:', error);
   if (server) {
     server.close(() => {
-      console.log(error)
-      process.exit(1)
-    })
+      console.error('Server closed due to unhandled rejection');
+      process.exit(1);
+    });
   } else {
-    process.exit(1)
+    process.exit(1);
   }
-})
-
-boostrap()
+});
 
 process.on('SIGTERM', () => {
-  console.log('SIGTERM is received')
+  console.log('SIGTERM received. Shutting down gracefully...');
   if (server) {
-    server.close()
+    server.close(() => {
+      console.log('Server closed');
+    });
   }
-})
+});
+
+boostrap();
